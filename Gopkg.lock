@@ -3,7 +3,7 @@
 
 [[projects]]
   name = "cloud.google.com/go"
-  packages = ["bigquery","civil","compute/metadata","internal","internal/atomiccache","internal/fields","internal/optional","internal/version"]
+  packages = ["compute/metadata","iam","internal","internal/optional","internal/version","storage"]
   revision = "050b16d2314d5fc3d4c9a51e4cd5c7468e77f162"
   version = "v0.17.0"
 
@@ -28,7 +28,7 @@
 [[projects]]
   branch = "master"
   name = "github.com/golang/protobuf"
-  packages = ["proto","ptypes","ptypes/any","ptypes/duration","ptypes/timestamp"]
+  packages = ["proto","protoc-gen-go/descriptor","ptypes","ptypes/any","ptypes/duration","ptypes/timestamp"]
   revision = "1e59b77b52bf8e4b449a57e6f79f21226d571845"
 
 [[projects]]
@@ -36,6 +36,12 @@
   packages = ["."]
   revision = "317e0006254c44a0ac427cc52a0e083ff0b9622f"
   version = "v2.0.0"
+
+[[projects]]
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
 
 [[projects]]
   branch = "master"
@@ -58,7 +64,7 @@
 [[projects]]
   branch = "master"
   name = "google.golang.org/api"
-  packages = ["bigquery/v2","gensupport","googleapi","googleapi/internal/uritemplates","googleapi/transport","internal","iterator","option","transport/http"]
+  packages = ["bigquery/v2","gensupport","googleapi","googleapi/internal/uritemplates","googleapi/transport","internal","iterator","option","storage/v1","transport/http"]
   revision = "cf39d2072c48ea15238bddbc2caac7dfec109a04"
 
 [[projects]]
@@ -70,7 +76,7 @@
 [[projects]]
   branch = "master"
   name = "google.golang.org/genproto"
-  packages = ["googleapis/rpc/status"]
+  packages = ["googleapis/api/annotations","googleapis/iam/v1","googleapis/rpc/status"]
   revision = "a8101f21cf983e773d0c1133ebc5424792003214"
 
 [[projects]]
@@ -82,6 +88,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "43d4691215b843baca859c682454d882b02bb99007ac96193d5b788c6dfc80bc"
+  inputs-digest = "e9f97a1c4ff90a47f14917b228018f082281de9c106e7d8d93de2748c958c422"
   solver-name = "gps-cdcl"
   solver-version = 1

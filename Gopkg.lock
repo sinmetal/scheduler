@@ -16,7 +16,7 @@
 [[projects]]
   branch = "master"
   name = "github.com/favclip/testerator"
-  packages = ["."]
+  packages = [".","aeinternal/search","datastore","memcache","search"]
   revision = "334401dbe72dc66e5a940a8c04ae2ab4a9a5af5c"
 
 [[projects]]
@@ -32,6 +32,12 @@
   revision = "1e59b77b52bf8e4b449a57e6f79f21226d571845"
 
 [[projects]]
+  name = "github.com/google/uuid"
+  packages = ["."]
+  revision = "064e2069ce9c359c118179501254f67d7d37ba24"
+  version = "0.2"
+
+[[projects]]
   name = "github.com/googleapis/gax-go"
   packages = ["."]
   revision = "317e0006254c44a0ac427cc52a0e083ff0b9622f"
@@ -42,6 +48,12 @@
   packages = ["."]
   revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
   version = "v0.8.0"
+
+[[projects]]
+  name = "go.mercari.io/datastore"
+  packages = [".","aedatastore","internal","internal/c/atomiccache","internal/c/fields","internal/shared"]
+  revision = "97f56aa5de4ef24eecc87085bc873d5475bf935b"
+  version = "v0.13.0"
 
 [[projects]]
   branch = "master"
@@ -65,13 +77,13 @@
   branch = "master"
   name = "google.golang.org/api"
   packages = ["bigquery/v2","gensupport","googleapi","googleapi/internal/uritemplates","googleapi/transport","internal","iterator","option","storage/v1","transport/http"]
-  revision = "cf39d2072c48ea15238bddbc2caac7dfec109a04"
+  revision = "272e2963aad1a56aba54e1167c47abff8d37ac08"
 
 [[projects]]
+  branch = "master"
   name = "google.golang.org/appengine"
-  packages = [".","aetest","internal","internal/app_identity","internal/base","internal/datastore","internal/log","internal/modules","internal/remote_api","internal/urlfetch","internal/user","log","urlfetch","user"]
-  revision = "150dc57a1b433e64154302bdc40b6bb8aefa313a"
-  version = "v1.0.0"
+  packages = [".","aetest","datastore","internal","internal/app_identity","internal/base","internal/datastore","internal/log","internal/memcache","internal/modules","internal/remote_api","internal/search","internal/taskqueue","internal/urlfetch","internal/user","log","memcache","search","taskqueue","urlfetch","user"]
+  revision = "5bee14b453b4c71be47ec1781b0fa61c2ea182db"
 
 [[projects]]
   branch = "master"
@@ -88,6 +100,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e9f97a1c4ff90a47f14917b228018f082281de9c106e7d8d93de2748c958c422"
+  inputs-digest = "2f88f56b49a1565d98dae0ca669f8e7ed7edf2bb4ab8634c0ec66826d26478a4"
   solver-name = "gps-cdcl"
   solver-version = 1

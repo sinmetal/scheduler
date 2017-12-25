@@ -55,14 +55,16 @@ func (api *BatchAPI) Post(ctx context.Context, form *BatchAPIPostRequest) (*Batc
 	}
 	log.Infof(ctx, "query from storage=%s", query)
 
+	const dateLayout = "20060102"
+	const queueName = "batch-query"
 	var tasks []*taskqueue.Task
-	sd, err := time.Parse("20060102", form.StartDate)
+	sd, err := time.Parse(dateLayout, form.StartDate)
 	if err != nil {
 		return nil, err
 	}
 	for i := 0; i < form.CountDate; i++ {
 		d := sd.AddDate(0, 0, i)
-		ds := d.Format("20060102")
+		ds := d.Format(dateLayout)
 		q, err := ExecuteTemplate(query, map[string]interface{}{
 			"DATE": ds,
 		})
@@ -93,9 +95,18 @@ func (api *BatchAPI) Post(ctx context.Context, form *BatchAPIPostRequest) (*Batc
 				Method:  http.MethodPost,
 				Payload: b,
 			})
+		if len(tasks) > 93 {
+			_, err = taskqueue.AddMulti(ctx, tasks, queueName)
+			if err != nil {
+				log.Errorf(ctx, "taskqueue.AddMulti :%v", err)
+				return nil, err
+			}
+			tasks = []*taskqueue.Task{}
+			log.Infof(ctx, "taskqueue.AddMulti: count=%d", i)
+		}
 	}
 
-	_, err = taskqueue.AddMulti(ctx, tasks, "batch-query")
+	_, err = taskqueue.AddMulti(ctx, tasks, queueName)
 	if err != nil {
 		log.Errorf(ctx, "taskqueue.AddMulti :%v", err)
 		return nil, err

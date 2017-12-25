@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/favclip/ucon"
 	"github.com/favclip/ucon/swagger"
@@ -63,14 +64,16 @@ func (api *BigQueryAPI) Post(ctx context.Context, form *BigQueryAPIPostRequest) 
 			log.Errorf(ctx, "Failed to Get Object From Storage: %v", err)
 			return nil, err
 		}
-		log.Infof(ctx, "query=%s", query)
+		log.Infof(ctx, "query from storage=%s", query)
 		form.Query = query
 	}
 	if len(form.Query) < 1 {
 		return nil, errors.New("query is required")
 	}
 
-	client, err := google.DefaultClient(ctx, bigquery.BigqueryScope)
+	ctxWithTimeout, cancel := context.WithTimeout(ctx, 30*time.Second)
+	defer cancel()
+	client, err := google.DefaultClient(ctxWithTimeout, bigquery.BigqueryScope)
 	if err != nil {
 		log.Errorf(ctx, "Failed to create client: %v", err)
 		return nil, err
@@ -92,6 +95,7 @@ func (api *BigQueryAPI) Post(ctx context.Context, form *BigQueryAPIPostRequest) 
 				},
 				AllowLargeResults: true,
 				CreateDisposition: "CreateIfNeeded",
+				WriteDisposition:  "WRITE_TRUNCATE",
 				DestinationTable: &bigquery.TableReference{
 					ProjectId: form.DstProjectID,
 					DatasetId: form.DstDatasetID,

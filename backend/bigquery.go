@@ -92,6 +92,7 @@ func (api *BigQueryAPI) Post(ctx context.Context, form *BigQueryAPIPostRequest) 
 				},
 				AllowLargeResults: true,
 				CreateDisposition: "CreateIfNeeded",
+				WriteDisposition:  "WRITE_TRUNCATE",
 				DestinationTable: &bigquery.TableReference{
 					ProjectId: form.DstProjectID,
 					DatasetId: form.DstDatasetID,

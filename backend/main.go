@@ -35,6 +35,7 @@ func init() {
 
 	setupOrderP1(swPlugin)
 	setupBigQuery(swPlugin)
+	setUpBatch(swPlugin)
 
 	ucon.DefaultMux.Prepare()
 	http.Handle("/", ucon.DefaultMux)

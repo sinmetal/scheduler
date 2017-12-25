@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/favclip/ucon"
 	"github.com/favclip/ucon/swagger"
@@ -70,7 +71,9 @@ func (api *BigQueryAPI) Post(ctx context.Context, form *BigQueryAPIPostRequest) 
 		return nil, errors.New("query is required")
 	}
 
-	client, err := google.DefaultClient(ctx, bigquery.BigqueryScope)
+	ctxWithTimeout, cancel := context.WithTimeout(ctx, 30*time.Second)
+	defer cancel()
+	client, err := google.DefaultClient(ctxWithTimeout, bigquery.BigqueryScope)
 	if err != nil {
 		log.Errorf(ctx, "Failed to create client: %v", err)
 		return nil, err

@@ -2,14 +2,17 @@ package backend
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 
 	"github.com/favclip/ucon"
 	"github.com/favclip/ucon/swagger"
 
-	"cloud.google.com/go/bigquery"
+	"google.golang.org/api/bigquery/v2"
 
 	"google.golang.org/appengine/log"
+
+	"golang.org/x/oauth2/google"
 )
 
 // BigQueryAPI is BigQuery API
@@ -43,30 +46,54 @@ type BigQueryAPIPostResponse struct {
 
 // Post is BigQuery API Post Handler
 func (api *BigQueryAPI) Post(ctx context.Context, form *BigQueryAPIPostRequest) (*BigQueryAPIPostResponse, error) {
-	client, err := bigquery.NewClient(ctx, form.ProjectID)
+	client, err := google.DefaultClient(ctx, bigquery.BigqueryScope)
 	if err != nil {
 		log.Errorf(ctx, "Failed to create client: %v", err)
 		return nil, err
 	}
-
-	q := client.Query(form.Query)
-	q.Priority = bigquery.BatchPriority
-	q.DefaultProjectID = form.ProjectID
-	q.DefaultDatasetID = form.DstDatasetID
-	q.AllowLargeResults = true
-	q.CreateDisposition = bigquery.CreateIfNeeded // 選択可能な必要がある
-	q.Dst = &bigquery.Table{
-		ProjectID: form.DstProjectID,
-		DatasetID: form.DstDatasetID,
-		TableID:   form.DstTableID,
+	bq, err := bigquery.New(client)
+	if err != nil {
+		log.Errorf(ctx, "Failed to create bigquery service: %v", err)
+		return nil, err
 	}
-	q.UseLegacySQL = false
-	job, err := q.Run(ctx)
+
+	job, err := bq.Jobs.Insert(form.ProjectID, &bigquery.Job{
+		Configuration: &bigquery.JobConfiguration{
+			Query: &bigquery.JobConfigurationQuery{
+				Query:    form.Query,
+				Priority: "Batch",
+				DefaultDataset: &bigquery.DatasetReference{
+					ProjectId: form.DstProjectID,
+					DatasetId: form.DstDatasetID,
+				},
+				AllowLargeResults: true,
+				CreateDisposition: "CreateIfNeeded",
+				DestinationTable: &bigquery.TableReference{
+					ProjectId: form.DstProjectID,
+					DatasetId: form.DstDatasetID,
+					TableId:   form.DstTableID,
+				},
+				TimePartitioning: &bigquery.TimePartitioning{
+					Type: "DAY",
+				},
+				//UseLegacySql:    false,
+				//ForceSendFields: []string{"UseLegacySql"},
+			},
+		},
+	}).Do()
 	if err != nil {
 		log.Errorf(ctx, "Failed to insert query job: %v", err)
 		return nil, err
 	}
+
+	b, err := json.Marshal(job)
+	if err != nil {
+		log.Errorf(ctx, "Failed to response job marshal to json: %v", err)
+		return nil, err
+	}
+	log.Infof(ctx, "%s", string(b))
+
 	return &BigQueryAPIPostResponse{
-		JobID: job.ID(),
+		JobID: job.Id,
 	}, nil
 }

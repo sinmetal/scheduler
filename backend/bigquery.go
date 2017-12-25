@@ -63,7 +63,7 @@ func (api *BigQueryAPI) Post(ctx context.Context, form *BigQueryAPIPostRequest) 
 			log.Errorf(ctx, "Failed to Get Object From Storage: %v", err)
 			return nil, err
 		}
-		log.Infof(ctx, "query=%s", query)
+		log.Infof(ctx, "query from storage=%s", query)
 		form.Query = query
 	}
 	if len(form.Query) < 1 {

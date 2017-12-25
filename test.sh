@@ -1,1 +1,1 @@
-goapp test github.com/sinmetal/scheduler/backend
+goapp test -v github.com/sinmetal/scheduler/backend

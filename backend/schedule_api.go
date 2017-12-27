@@ -28,7 +28,6 @@ type ScheduleAPIPostRequest struct {
 	DstProjectID      string `json:"dstProjectID"`
 	DstDatasetID      string `json:"dstDatasetID"`
 	DstTableID        string `json:"dstTableID"`
-	Query             string `json:"query"`
 	QueryPathBucket   string `json:"queryPathBucket"`
 	QueryPathObject   string `json:"queryPathObject"`
 	CreateDisposition string `json:"createDisposition"`
@@ -56,7 +55,7 @@ func (api *ScheduleAPI) Post(ctx context.Context, form *ScheduleAPIPostRequest) 
 		ProjectID:       form.ProjectID,
 		DstProjectID:    form.DstProjectID,
 		DstDatasetID:    form.DstDatasetID,
-		Query:           form.Query,
+		DstTableID:      form.DstTableID,
 		QueryPathBucket: form.QueryPathBucket,
 		QueryPathObject: form.QueryPathObject,
 		ScheduleV1:      form.ScheduleV1,

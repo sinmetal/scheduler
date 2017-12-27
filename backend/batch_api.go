@@ -105,11 +105,12 @@ func (api *BatchAPI) Post(ctx context.Context, form *BatchAPIPostRequest) (*Batc
 			log.Infof(ctx, "taskqueue.AddMulti: count=%d", i)
 		}
 	}
-
-	_, err = taskqueue.AddMulti(ctx, tasks, queueName)
-	if err != nil {
-		log.Errorf(ctx, "taskqueue.AddMulti :%v", err)
-		return nil, err
+	if len(tasks) > 0 {
+		_, err = taskqueue.AddMulti(ctx, tasks, queueName)
+		if err != nil {
+			log.Errorf(ctx, "taskqueue.AddMulti :%v", err)
+			return nil, err
+		}
 	}
 
 	return &BatchAPIPostResponse{}, nil

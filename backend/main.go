@@ -19,10 +19,10 @@ func init() {
 	swPlugin := swagger.NewPlugin(&swagger.Options{
 		Object: &swagger.Object{
 			Info: &swagger.Info{
-				Title:   "vvakame-store-tester",
+				Title:   "scheduler",
 				Version: "v1",
 			},
-			Schemes: []string{"http"},
+			Schemes: []string{"http", "https"},
 		},
 		DefinitionNameModifier: func(refT reflect.Type, defName string) string {
 			if strings.HasSuffix(defName, "JSON") {
@@ -37,6 +37,8 @@ func init() {
 	setupBigQuery(swPlugin)
 	setUpBatch(swPlugin)
 	setupScheduleAPI(swPlugin)
+	setUpTQBuildeQueryAPI(swPlugin)
+	setupCronQueryAPI(swPlugin)
 
 	ucon.DefaultMux.Prepare()
 	http.Handle("/", ucon.DefaultMux)

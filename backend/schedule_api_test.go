@@ -23,7 +23,6 @@ func TestScheduleAPI_Post(t *testing.T) {
 		DstProjectID:      "dstprojectid",
 		DstDatasetID:      "dstdatasetid",
 		DstTableID:        "dsttableid",
-		Query:             "select 1",
 		QueryPathBucket:   "hogebucket",
 		QueryPathObject:   "hogeobject",
 		CreateDisposition: "",

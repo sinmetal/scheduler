@@ -1,0 +1,6 @@
+cron:
+- description: "daily query run"
+  url: /cron/query
+  schedule: every day 01:01
+  timezone: UTC
+  target: scheduler

@@ -12,6 +12,9 @@ automatic_scaling:
   max_concurrent_requests: 80
 
 handlers:
+- url: /swagger-ui
+  static_dir: swagger-ui
+  login: admin
 - url: /.*
   script: _go_app
   login: admin

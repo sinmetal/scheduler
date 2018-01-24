@@ -37,6 +37,7 @@ func init() {
 	setupBigQuery(swPlugin)
 	setUpBatch(swPlugin)
 	setupScheduleAPI(swPlugin)
+	setupScheduleDatastoreExportAPI(swPlugin)
 	setUpTQBuildeQueryAPI(swPlugin)
 	setupCronQueryAPI(swPlugin)
 

@@ -1,6 +1,6 @@
 queue:
 - name: batch-query
-  rate: 1/s
+  rate: 2/m
   bucket_size: 1
   max_concurrent_requests: 1
   retry_parameters:

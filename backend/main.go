@@ -39,6 +39,7 @@ func init() {
 	setupScheduleAPI(swPlugin)
 	setupScheduleDatastoreExportAPI(swPlugin)
 	setUpTQBuildeQueryAPI(swPlugin)
+	setupTQDatastoreExportAPI(swPlugin)
 	setupCronQueryAPI(swPlugin)
 
 	ucon.DefaultMux.Prepare()

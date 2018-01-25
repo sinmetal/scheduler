@@ -71,7 +71,9 @@ func (api *TQDatastoreExportAPI) Call(ctx context.Context, form *TQDatastoreExpo
 		Payload: b,
 		Header:  h,
 	}
-	_, err = taskqueue.Add(ctx, t, "datastore-export")
+
+	tq := NewTaskQueueService()
+	_, err = tq.Add(ctx, t, "datastore-export")
 	if err != nil {
 		return errors.Wrap(err, "failed taskqueue.add")
 	}

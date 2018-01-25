@@ -34,6 +34,7 @@ func TestScheduleDatastoreExportAPI_Post(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	r.Header.Set("Content-Type", "application/json;charset=utf-8")
 
 	w := httptest.NewRecorder()
 	http.DefaultServeMux.ServeHTTP(w, r)

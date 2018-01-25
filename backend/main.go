@@ -41,6 +41,7 @@ func init() {
 	setUpTQBuildeQueryAPI(swPlugin)
 	setupTQDatastoreExportAPI(swPlugin)
 	setupCronQueryAPI(swPlugin)
+	setupCronDatastoreExportAPI(swPlugin)
 
 	ucon.DefaultMux.Prepare()
 	http.Handle("/", ucon.DefaultMux)

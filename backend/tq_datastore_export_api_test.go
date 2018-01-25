@@ -4,27 +4,26 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"ds2bq"
 	"github.com/favclip/testerator"
 )
 
+// MockDS2BQService is DS2BQService Mock
 type MockDS2BQService struct {
 	exportCallCount int
-	form            *ds2bq.ExportForm
+	form            *DatastoreExportForm
 }
 
-func (s *MockDS2BQService) Export(ctx context.Context, form *ds2bq.ExportForm) error {
+func (s *MockDS2BQService) Export(ctx context.Context, form *DatastoreExportForm) error {
 	s.exportCallCount++
 	s.form = form
 	return nil
 }
-
-var _ ds2bq.DS2BQService = &MockDS2BQService{}
 
 func TestTQDatastoreExportAPI_Post(t *testing.T) {
 	inst, _, err := testerator.SpinUp()
@@ -34,7 +33,7 @@ func TestTQDatastoreExportAPI_Post(t *testing.T) {
 	defer testerator.SpinDown()
 
 	mock := MockDS2BQService{}
-	ds2bq.SetDS2BQService(&mock)
+	setDS2BQService(&mock)
 
 	form := TQDatastoreExportAPIPostRequest{
 		ProjectID: "sampleprojectid",
@@ -46,10 +45,11 @@ func TestTQDatastoreExportAPI_Post(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	r, err := inst.NewRequest(http.MethodPost, "/tq/datastore/export", bytes.NewBuffer(b))
+	r, err := inst.NewRequest(http.MethodPost, "/tq/datastore/export", bytes.NewReader(b))
 	if err != nil {
 		t.Fatal(err)
 	}
+	r.Header.Set("Content-Type", "application/json;charset=utf-8")
 
 	w := httptest.NewRecorder()
 	http.DefaultServeMux.ServeHTTP(w, r)
@@ -60,7 +60,7 @@ func TestTQDatastoreExportAPI_Post(t *testing.T) {
 	}
 
 	if e, g := 1, mock.exportCallCount; e != g {
-		t.Fatalf("unexpected exportCallCount is %s. got : %s", e, g)
+		t.Fatalf("unexpected exportCallCount is %d. got : %d", e, g)
 	}
 	if e, g := form.ProjectID, mock.form.ProjectID; e != g {
 		t.Fatalf("unexpected ProjectID is %s. got : %s", e, g)
@@ -74,7 +74,7 @@ func TestTQDatastoreExportAPI_Post(t *testing.T) {
 	if e, g := form.Kinds[1], mock.form.Kinds[1]; e != g {
 		t.Fatalf("unexpected Kinds[1] is %s. got : %s", e, g)
 	}
-	if e, g := form.Bucket, mock.form.Bucket; e != g {
+	if e, g := fmt.Sprintf("gs://%s", form.Bucket), mock.form.Bucket; e != g {
 		t.Fatalf("unexpected Bucket is %s. got : %s", e, g)
 	}
 }

@@ -2,26 +2,32 @@ package backend
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 
-	"ds2bq"
 	"github.com/favclip/ucon"
 	"github.com/favclip/ucon/swagger"
+	"github.com/pkg/errors"
 	"google.golang.org/appengine/log"
+	"google.golang.org/appengine/taskqueue"
 )
 
 // TQDatastoreExportAPI is Datastore Export Job Start API
-type TQDatastoreExportAPI struct{}
+type TQDatastoreExportAPI struct {
+	Path string
+}
 
 func setupTQDatastoreExportAPI(swPlugin *swagger.Plugin) {
-	api := TQDatastoreExportAPI{}
+	api := TQDatastoreExportAPI{
+		Path: "/tq/datastore/export",
+	}
 
 	tag := swPlugin.AddTag(&swagger.Tag{Name: "TQ Datastore Export", Description: "TQ Datastore Export API list"})
 	var hInfo *swagger.HandlerInfo
 
 	hInfo = swagger.NewHandlerInfo(api.Post)
-	ucon.Handle(http.MethodPost, "/tq/datastore/export", hInfo)
+	ucon.Handle(http.MethodPost, api.Path, hInfo)
 	hInfo.Description, hInfo.Tags = "post to Datastore Export", []string{tag.Name}
 }
 
@@ -36,8 +42,8 @@ type TQDatastoreExportAPIPostRequest struct {
 func (api *TQDatastoreExportAPI) Post(ctx context.Context, form *TQDatastoreExportAPIPostRequest) error {
 	log.Infof(ctx, "request body = %v", form)
 
-	s := ds2bq.NewDS2BQService()
-	err := s.Export(ctx, &ds2bq.ExportForm{
+	s := NewDS2BQService()
+	err := s.Export(ctx, &DatastoreExportForm{
 		ProjectID: form.ProjectID,
 		Bucket:    fmt.Sprintf("gs://%s", form.Bucket),
 		Kinds:     form.Kinds,
@@ -45,6 +51,29 @@ func (api *TQDatastoreExportAPI) Post(ctx context.Context, form *TQDatastoreExpo
 	if err != nil {
 		log.Errorf(ctx, "failed datastore export : %v", err)
 		return err
+	}
+
+	return nil
+}
+
+// Call is Add to Task
+func (api *TQDatastoreExportAPI) Call(ctx context.Context, form *TQDatastoreExportAPIPostRequest) error {
+	b, err := json.Marshal(form)
+	if err != nil {
+		return err
+	}
+
+	h := http.Header{}
+	h["Content-Type"] = []string{"application/json;charset=utf-8"}
+	t := &taskqueue.Task{
+		Method:  http.MethodPost,
+		Path:    api.Path,
+		Payload: b,
+		Header:  h,
+	}
+	_, err = taskqueue.Add(ctx, t, "datastore-export")
+	if err != nil {
+		return errors.Wrap(err, "failed taskqueue.add")
 	}
 
 	return nil

@@ -33,12 +33,14 @@ func init() {
 	})
 	ucon.Plugin(swPlugin)
 
-	setupOrderP1(swPlugin)
 	setupBigQuery(swPlugin)
 	setUpBatch(swPlugin)
 	setupScheduleAPI(swPlugin)
+	setupScheduleDatastoreExportAPI(swPlugin)
 	setUpTQBuildeQueryAPI(swPlugin)
+	setupTQDatastoreExportAPI(swPlugin)
 	setupCronQueryAPI(swPlugin)
+	setupCronDatastoreExportAPI(swPlugin)
 
 	ucon.DefaultMux.Prepare()
 	http.Handle("/", ucon.DefaultMux)

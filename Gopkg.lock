@@ -3,9 +3,22 @@
 
 [[projects]]
   name = "cloud.google.com/go"
-  packages = ["compute/metadata","iam","internal","internal/optional","internal/version","storage"]
-  revision = "050b16d2314d5fc3d4c9a51e4cd5c7468e77f162"
-  version = "v0.17.0"
+  packages = [
+    "compute/metadata",
+    "iam",
+    "internal",
+    "internal/optional",
+    "internal/version",
+    "storage"
+  ]
+  revision = "767c40d6a2e058483c25fa193e963a22da17236d"
+  version = "v0.18.0"
+
+[[projects]]
+  name = "github.com/favclip/ds2bq"
+  packages = ["."]
+  revision = "73bc787eb607dae80eb1dd085a37e3a4123a77bb"
+  version = "v2.1.1"
 
 [[projects]]
   name = "github.com/favclip/golidator"
@@ -16,20 +29,36 @@
 [[projects]]
   branch = "master"
   name = "github.com/favclip/testerator"
-  packages = [".","aeinternal/search","datastore","memcache","search"]
+  packages = [
+    ".",
+    "aeinternal/search",
+    "datastore",
+    "memcache",
+    "search"
+  ]
   revision = "334401dbe72dc66e5a940a8c04ae2ab4a9a5af5c"
 
 [[projects]]
   name = "github.com/favclip/ucon"
-  packages = [".","swagger"]
-  revision = "b423b286da50624062596296322e78c743924b0e"
-  version = "v1.0.0"
+  packages = [
+    ".",
+    "swagger"
+  ]
+  revision = "ccb694c2d08eb1e9d120a7b262b13ffc15bafb42"
+  version = "v2.0.0"
 
 [[projects]]
   branch = "master"
   name = "github.com/golang/protobuf"
-  packages = ["proto","protoc-gen-go/descriptor","ptypes","ptypes/any","ptypes/duration","ptypes/timestamp"]
-  revision = "1e59b77b52bf8e4b449a57e6f79f21226d571845"
+  packages = [
+    "proto",
+    "protoc-gen-go/descriptor",
+    "ptypes",
+    "ptypes/any",
+    "ptypes/duration",
+    "ptypes/timestamp"
+  ]
+  revision = "c65a0412e71e8b9b3bfd22925720d23c0f054237"
 
 [[projects]]
   name = "github.com/google/uuid"
@@ -44,6 +73,12 @@
   version = "v2.0.0"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/mjibson/goon"
+  packages = ["."]
+  revision = "0cd9745d6b9c43c1de754769708fb2ac349d84b2"
+
+[[projects]]
   name = "github.com/pkg/errors"
   packages = ["."]
   revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
@@ -51,55 +86,153 @@
 
 [[projects]]
   name = "go.mercari.io/datastore"
-  packages = [".","aedatastore","internal","internal/c/atomiccache","internal/c/fields","internal/shared"]
-  revision = "97f56aa5de4ef24eecc87085bc873d5475bf935b"
-  version = "v0.13.0"
+  packages = [
+    ".",
+    "aedatastore",
+    "internal",
+    "internal/c/atomiccache",
+    "internal/c/fields",
+    "internal/shared"
+  ]
+  revision = "5e160d5f7b0e4404d0ce5ca2ec242141e910ad26"
+  version = "v0.16.0"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
-  packages = ["context","context/ctxhttp","http2","http2/hpack","idna","internal/timeseries","lex/httplex","trace"]
-  revision = "d866cfc389cec985d6fda2859936a575a55a3ab6"
+  packages = [
+    "context",
+    "context/ctxhttp",
+    "http2",
+    "http2/hpack",
+    "idna",
+    "internal/timeseries",
+    "lex/httplex",
+    "trace"
+  ]
+  revision = "0ed95abb35c445290478a5348a7b38bb154135fd"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/oauth2"
-  packages = [".","google","internal","jws","jwt"]
-  revision = "0448841f0cbe9d174c6c1cedd177f583337b8e2c"
+  packages = [
+    ".",
+    "google",
+    "internal",
+    "jws",
+    "jwt"
+  ]
+  revision = "b28fcf2b08a19742b43084fb40ab78ac6c3d8067"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/text"
-  packages = ["collate","collate/build","internal/colltab","internal/gen","internal/tag","internal/triegen","internal/ucd","language","secure/bidirule","transform","unicode/bidi","unicode/cldr","unicode/norm","unicode/rangetable"]
-  revision = "eb22672bea55af56d225d4e35405f4d2e9f062a0"
+  packages = [
+    "collate",
+    "collate/build",
+    "internal/colltab",
+    "internal/gen",
+    "internal/tag",
+    "internal/triegen",
+    "internal/ucd",
+    "language",
+    "secure/bidirule",
+    "transform",
+    "unicode/bidi",
+    "unicode/cldr",
+    "unicode/norm",
+    "unicode/rangetable"
+  ]
+  revision = "e19ae1496984b1c655b8044a65c0300a3c878dd3"
 
 [[projects]]
   branch = "master"
   name = "google.golang.org/api"
-  packages = ["bigquery/v2","gensupport","googleapi","googleapi/internal/uritemplates","googleapi/transport","internal","iterator","option","storage/v1","transport/http"]
-  revision = "272e2963aad1a56aba54e1167c47abff8d37ac08"
+  packages = [
+    "bigquery/v2",
+    "datastore/v1beta1",
+    "gensupport",
+    "googleapi",
+    "googleapi/internal/uritemplates",
+    "googleapi/transport",
+    "internal",
+    "iterator",
+    "option",
+    "storage/v1",
+    "transport/http"
+  ]
+  revision = "adc96e7cd85a1474b9ffb0c47dbc327d0e7ce5fb"
 
 [[projects]]
   branch = "master"
   name = "google.golang.org/appengine"
-  packages = [".","aetest","datastore","internal","internal/app_identity","internal/base","internal/datastore","internal/log","internal/memcache","internal/modules","internal/remote_api","internal/search","internal/taskqueue","internal/urlfetch","internal/user","log","memcache","search","taskqueue","urlfetch","user"]
+  packages = [
+    ".",
+    "aetest",
+    "datastore",
+    "internal",
+    "internal/app_identity",
+    "internal/base",
+    "internal/datastore",
+    "internal/log",
+    "internal/memcache",
+    "internal/modules",
+    "internal/remote_api",
+    "internal/search",
+    "internal/taskqueue",
+    "internal/urlfetch",
+    "internal/user",
+    "log",
+    "memcache",
+    "search",
+    "taskqueue",
+    "urlfetch",
+    "user"
+  ]
   revision = "5bee14b453b4c71be47ec1781b0fa61c2ea182db"
 
 [[projects]]
   branch = "master"
   name = "google.golang.org/genproto"
-  packages = ["googleapis/api/annotations","googleapis/iam/v1","googleapis/rpc/status"]
-  revision = "a8101f21cf983e773d0c1133ebc5424792003214"
+  packages = [
+    "googleapis/api/annotations",
+    "googleapis/iam/v1",
+    "googleapis/rpc/status"
+  ]
+  revision = "14790a1795ea4c3387aaf24aed670ddb51f18292"
 
 [[projects]]
   name = "google.golang.org/grpc"
-  packages = [".","balancer","balancer/roundrobin","codes","connectivity","credentials","encoding","grpclb/grpc_lb_v1/messages","grpclog","internal","keepalive","metadata","naming","peer","resolver","resolver/dns","resolver/passthrough","stats","status","tap","transport"]
-  revision = "e687fa4e6424368ece6e4fe727cea2c806a0fcb4"
-  version = "v1.8.2"
+  packages = [
+    ".",
+    "balancer",
+    "balancer/base",
+    "balancer/roundrobin",
+    "codes",
+    "connectivity",
+    "credentials",
+    "encoding",
+    "grpclb/grpc_lb_v1/messages",
+    "grpclog",
+    "internal",
+    "keepalive",
+    "metadata",
+    "naming",
+    "peer",
+    "resolver",
+    "resolver/dns",
+    "resolver/passthrough",
+    "stats",
+    "status",
+    "tap",
+    "transport"
+  ]
+  revision = "6b51017f791ae1cfbec89c52efdf444b13b550ef"
+  version = "v1.9.2"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2f88f56b49a1565d98dae0ca669f8e7ed7edf2bb4ab8634c0ec66826d26478a4"
+  inputs-digest = "41e1dab4214bf5af8e2cecaea94fda0d02ac89fc4a781879f4e5b867f0d1f430"
   solver-name = "gps-cdcl"
   solver-version = 1

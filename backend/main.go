@@ -33,7 +33,6 @@ func init() {
 	})
 	ucon.Plugin(swPlugin)
 
-	setupOrderP1(swPlugin)
 	setupBigQuery(swPlugin)
 	setUpBatch(swPlugin)
 	setupScheduleAPI(swPlugin)

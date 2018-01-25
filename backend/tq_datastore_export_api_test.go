@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -74,7 +73,7 @@ func TestTQDatastoreExportAPI_Post(t *testing.T) {
 	if e, g := form.Kinds[1], mock.form.Kinds[1]; e != g {
 		t.Fatalf("unexpected Kinds[1] is %s. got : %s", e, g)
 	}
-	if e, g := fmt.Sprintf("gs://%s", form.Bucket), mock.form.Bucket; e != g {
+	if e, g := form.Bucket, mock.form.Bucket; e != g {
 		t.Fatalf("unexpected Bucket is %s. got : %s", e, g)
 	}
 }

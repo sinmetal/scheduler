@@ -3,7 +3,6 @@ package backend
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/favclip/ucon"
@@ -13,21 +12,21 @@ import (
 	"google.golang.org/appengine/taskqueue"
 )
 
+// TQDatastoreExportAPIPath is TQDatastoreExportAPI Path
+const TQDatastoreExportAPIPath = "/tq/datastore/export"
+
 // TQDatastoreExportAPI is Datastore Export Job Start API
 type TQDatastoreExportAPI struct {
-	Path string
 }
 
 func setupTQDatastoreExportAPI(swPlugin *swagger.Plugin) {
-	api := TQDatastoreExportAPI{
-		Path: "/tq/datastore/export",
-	}
+	api := TQDatastoreExportAPI{}
 
 	tag := swPlugin.AddTag(&swagger.Tag{Name: "TQ Datastore Export", Description: "TQ Datastore Export API list"})
 	var hInfo *swagger.HandlerInfo
 
 	hInfo = swagger.NewHandlerInfo(api.Post)
-	ucon.Handle(http.MethodPost, api.Path, hInfo)
+	ucon.Handle(http.MethodPost, TQDatastoreExportAPIPath, hInfo)
 	hInfo.Description, hInfo.Tags = "post to Datastore Export", []string{tag.Name}
 }
 
@@ -45,7 +44,7 @@ func (api *TQDatastoreExportAPI) Post(ctx context.Context, form *TQDatastoreExpo
 	s := NewDS2BQService()
 	err := s.Export(ctx, &DatastoreExportForm{
 		ProjectID: form.ProjectID,
-		Bucket:    fmt.Sprintf("gs://%s", form.Bucket),
+		Bucket:    form.Bucket,
 		Kinds:     form.Kinds,
 	})
 	if err != nil {
@@ -67,7 +66,7 @@ func (api *TQDatastoreExportAPI) Call(ctx context.Context, form *TQDatastoreExpo
 	h["Content-Type"] = []string{"application/json;charset=utf-8"}
 	t := &taskqueue.Task{
 		Method:  http.MethodPost,
-		Path:    api.Path,
+		Path:    TQDatastoreExportAPIPath,
 		Payload: b,
 		Header:  h,
 	}

@@ -54,6 +54,9 @@ func TestCronDatastoreExportAPI_Get(t *testing.T) {
 	if e, g := 1, len(mock.Values); e != g {
 		t.Fatalf("unexpected Tasks.len expected %d; got %d", e, g)
 	}
+	if e, g := "/tq/datastore/export", mock.Values[0].task.Path; e != g {
+		t.Fatalf("unexpected Tasks.Path expected %s; got %s", e, g)
+	}
 
 	var form TQDatastoreExportAPIPostRequest
 	if err := json.Unmarshal(mock.Values[0].task.Payload, &form); err != nil {

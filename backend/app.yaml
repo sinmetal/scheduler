@@ -1,5 +1,5 @@
-application: gcpugjp
-module: scheduler
+application: scheduler
+module: default
 version: 1
 runtime: go
 api_version: go1
@@ -12,9 +12,15 @@ automatic_scaling:
   max_concurrent_requests: 80
 
 handlers:
+# domain verify for sinmetal
+- url: /googlee8b3bb4ba6763838.html
+  static_files: googlee8b3bb4ba6763838.html
+  upload: googlee8b3bb4ba6763838.html
 - url: /swagger-ui
   static_dir: swagger-ui
   login: admin
+- url: /ocn/.*
+  script: _go_app
 - url: /.*
   script: _go_app
   login: admin

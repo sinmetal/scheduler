@@ -7,7 +7,6 @@ import (
 
 	"github.com/favclip/ucon"
 	"github.com/favclip/ucon/swagger"
-
 	"google.golang.org/appengine"
 )
 
@@ -41,6 +40,9 @@ func init() {
 	setupTQDatastoreExportAPI(swPlugin)
 	setupCronQueryAPI(swPlugin)
 	setupCronDatastoreExportAPI(swPlugin)
+
+	ucon.HandleFunc(http.MethodPost, "/ocn/datastore-export", ReceiveOCNHandler)
+	ucon.HandleFunc(http.MethodPost, "/tq/gcs/object-to-bq", ImportBigQueryHandleFunc("datastore_imports"))
 
 	ucon.DefaultMux.Prepare()
 	http.Handle("/", ucon.DefaultMux)

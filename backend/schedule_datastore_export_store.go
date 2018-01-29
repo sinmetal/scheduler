@@ -90,3 +90,25 @@ func (store *ScheduleDatastoreExportStore) ListAll(ctx context.Context) ([]*Sche
 
 	return sl, nil
 }
+
+// QueryByBucket is Bucketが一致するEntity Listを取得する
+func (store *ScheduleDatastoreExportStore) QueryByBucket(ctx context.Context, bucket string) ([]*ScheduleDatastoreExport, error) {
+	ds, err := fromContext(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "fromContext")
+	}
+
+	var sl []*ScheduleDatastoreExport
+	q := ds.NewQuery(store.Kind())
+	q = q.Filter("Bucket =", bucket)
+	kl, err := ds.GetAll(ctx, q, &sl)
+	if err != nil {
+		return nil, errors.Wrap(err, "datastore.GetAll")
+	}
+
+	for i, v := range kl {
+		sl[i].Key = v
+	}
+
+	return sl, nil
+}

@@ -3,4 +3,7 @@ cron:
   url: /cron/query
   schedule: every day 01:01
   timezone: UTC
-  target: scheduler
+- description: "daily datastore export"
+  url: /cron/datastore-export
+  schedule: every day 02:18
+  timezone: Asia/Tokyo

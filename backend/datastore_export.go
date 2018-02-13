@@ -57,7 +57,7 @@ func (s *DS2BQServiceImple) Export(ctx context.Context, form *DatastoreExportFor
 	eCall := service.Projects.Export(form.ProjectID, &dsapi.GoogleDatastoreAdminV1beta1ExportEntitiesRequest{
 		EntityFilter: &dsapi.GoogleDatastoreAdminV1beta1EntityFilter{
 			Kinds:           form.Kinds,
-			NamespaceIds:    []string{},
+			NamespaceIds:    []string{""},
 			ForceSendFields: []string{},
 			NullFields:      []string{},
 		},
@@ -67,13 +67,7 @@ func (s *DS2BQServiceImple) Export(ctx context.Context, form *DatastoreExportFor
 	if err != nil {
 		return errors.Wrap(err, "failed datastore export")
 	}
-	log.Infof(ctx, "Datastore Export Reponse Status Code : %s", op.HTTPStatusCode)
-	rj, err := op.Response.MarshalJSON()
-	if err != nil {
-		log.Errorf(ctx, "failed datastore export response to marshalJSON: %v", err)
-		return err
-	}
-	log.Infof(ctx, "%s", string(rj))
+	log.Infof(ctx, "Datastore Export Reponse Status Code : %d, Name : %s", op.HTTPStatusCode, op.Name)
 
 	if op.HTTPStatusCode != http.StatusOK {
 		return fmt.Errorf("Datastore Export Response Status Code = %d", op.HTTPStatusCode)

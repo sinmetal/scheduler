@@ -107,11 +107,12 @@ func insertImportJob(c context.Context, req *GCSObjectToBQJobReq, projectID, dat
 		},
 	}
 
-	_, err = bqs.Jobs.Insert(appengine.AppID(c), job).Do()
+	rj, err := bqs.Jobs.Insert(appengine.AppID(c), job).Do()
 	if err != nil {
 		log.Warningf(c, "ds2bq: unexpected error in HandleBackupToBQJob: %s", err)
 		return nil
 	}
+	log.Infof(c, "JobID=%s, Status=%s", rj.Id, rj.Status.State)
 
 	return nil
 }

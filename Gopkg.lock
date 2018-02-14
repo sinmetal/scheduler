@@ -48,7 +48,6 @@
   version = "v2.0.0"
 
 [[projects]]
-  branch = "master"
   name = "github.com/golang/protobuf"
   packages = [
     "proto",
@@ -58,7 +57,8 @@
     "ptypes/duration",
     "ptypes/timestamp"
   ]
-  revision = "c65a0412e71e8b9b3bfd22925720d23c0f054237"
+  revision = "925541529c1fa6821df4e44ce2723319eb2be768"
+  version = "v1.0.0"
 
 [[projects]]
   name = "github.com/google/uuid"
@@ -110,7 +110,7 @@
     "lex/httplex",
     "trace"
   ]
-  revision = "0ed95abb35c445290478a5348a7b38bb154135fd"
+  revision = "f5dfe339be1d06f81b22525fe34671ee7d2c8904"
 
 [[projects]]
   branch = "master"
@@ -122,7 +122,7 @@
     "jws",
     "jwt"
   ]
-  revision = "b28fcf2b08a19742b43084fb40ab78ac6c3d8067"
+  revision = "543e37812f10c46c622c9575afd7ad22f22a12ba"
 
 [[projects]]
   branch = "master"
@@ -143,7 +143,7 @@
     "unicode/norm",
     "unicode/rangetable"
   ]
-  revision = "e19ae1496984b1c655b8044a65c0300a3c878dd3"
+  revision = "4e4a3210bb54bb31f6ab2cdca2edcc0b50c420c1"
 
 [[projects]]
   branch = "master"
@@ -161,7 +161,7 @@
     "storage/v1",
     "transport/http"
   ]
-  revision = "adc96e7cd85a1474b9ffb0c47dbc327d0e7ce5fb"
+  revision = "87a2f5c77b3602f3ae7c8dca6d76f9c2b9bc0957"
 
 [[projects]]
   branch = "master"
@@ -199,7 +199,7 @@
     "googleapis/iam/v1",
     "googleapis/rpc/status"
   ]
-  revision = "14790a1795ea4c3387aaf24aed670ddb51f18292"
+  revision = "2b5a72b8730b0b16380010cfe5286c42108d88e7"
 
 [[projects]]
   name = "google.golang.org/grpc"
@@ -233,6 +233,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "41e1dab4214bf5af8e2cecaea94fda0d02ac89fc4a781879f4e5b867f0d1f430"
+  inputs-digest = "d13f6c373e1ed3cba9f16923879184b2b4f98611051be2fdd86a3767b1fdbf46"
   solver-name = "gps-cdcl"
   solver-version = 1

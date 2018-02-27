@@ -53,7 +53,7 @@ func (store *ScheduleDatastoreExportStore) NewKey(ctx context.Context, client da
 
 // Key is Create Schedule Model Key
 func (store *ScheduleDatastoreExportStore) Key(ctx context.Context, client datastore.Client, id string) datastore.Key {
-	return client.NameKey(store.Kind(), uuid.New().String(), nil)
+	return client.NameKey(store.Kind(), id, nil)
 }
 
 // Put is Schedule put to Datastore

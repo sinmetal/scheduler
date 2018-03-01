@@ -158,6 +158,7 @@
     "internal",
     "iterator",
     "option",
+    "sqladmin/v1beta4",
     "storage/v1",
     "transport/http"
   ]
@@ -233,6 +234,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "d13f6c373e1ed3cba9f16923879184b2b4f98611051be2fdd86a3767b1fdbf46"
+  inputs-digest = "8f023241ca0ed49387e252d3d3cc2a6bad946dceeb242e91ed56dd129993cb36"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -46,7 +46,7 @@ type BatchAPIPostResponse struct {
 
 // Post is Batch API Post Handler
 func (api *BatchAPI) Post(ctx context.Context, form *BatchAPIPostRequest) (*BatchAPIPostResponse, error) {
-	storageService := storageService{}
+	storageService := NewStorageService()
 
 	query, err := storageService.GetObject(ctx, form.QueryPathBucket, form.QueryPathObject)
 	if err != nil {

@@ -47,7 +47,7 @@ type BigQueryAPIPostResponse struct {
 
 // Post is BigQuery API Post Handler
 func (api *BigQueryAPI) Post(ctx context.Context, form *BigQueryAPIPostRequest) (*BigQueryAPIPostResponse, error) {
-	storageService := storageService{}
+	storageService := NewStorageService()
 
 	{
 		b, err := json.Marshal(form)

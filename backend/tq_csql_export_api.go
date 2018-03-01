@@ -45,7 +45,7 @@ type TQCloudSQLExportAPIPostRequest struct {
 func (api *TQCloudSQLExportAPI) Post(ctx context.Context, form *TQCloudSQLExportAPIPostRequest) error {
 	log.Infof(ctx, "request body = %v", form)
 
-	storageService := storageService{}
+	storageService := NewStorageService()
 	query, err := storageService.GetObject(ctx, form.SQLBucket, form.SQLObject)
 	if err != nil {
 		log.Errorf(ctx, "Failed to Get Object From Storage:\n %+v", err)
@@ -55,7 +55,7 @@ func (api *TQCloudSQLExportAPI) Post(ctx context.Context, form *TQCloudSQLExport
 
 	const dateLayout = "20060102150405"
 	y := time.Now().Format(dateLayout)
-	s := CloudSQLAdminService{}
+	s := NewCloudSQLAdminService()
 	err = s.Export(ctx, &CloudSQLExportConfig{
 		ProjectID: form.ProjectID,
 		Instance:  form.Instance,

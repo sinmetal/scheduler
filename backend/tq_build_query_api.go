@@ -45,7 +45,7 @@ type TQBuildQueryAPIPostResponse struct {
 
 // Post is TQBuildQueryAPI Post Handler
 func (api *TQBuildQueryAPI) Post(ctx context.Context, form *TQBuildQueryAPIPostRequest) (*TQBuildQueryAPIPostResponse, error) {
-	storageService := storageService{}
+	storageService := NewStorageService()
 
 	query, err := storageService.GetObject(ctx, form.QueryPathBucket, form.QueryPathObject)
 	if err != nil {

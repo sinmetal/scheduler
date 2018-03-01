@@ -23,7 +23,8 @@ func TestScheduleCloudSQLExportAPI_Post(t *testing.T) {
 	form := ScheduleCloudSQLExportAPIPostRequest{
 		ProjectID: "sampleprojectid",
 		Databases: []string{"db1"},
-		SQLURI:    "gs://hoge/sample.sql",
+		SQLBucket: "hoge",
+		SQLObject: "export.sql",
 		ExportURI: "gs://hoge/%s/sample.csv",
 	}
 	b, err := json.Marshal(form)

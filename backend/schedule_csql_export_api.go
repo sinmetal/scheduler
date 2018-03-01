@@ -25,8 +25,10 @@ func setupScheduleCloudSQLExportAPI(swPlugin *swagger.Plugin) {
 // ScheduleCloudSQLExportAPIPostRequest is Post Param
 type ScheduleCloudSQLExportAPIPostRequest struct {
 	ProjectID string   `json:"projectID"` // ExportするCloudSQLが存在するProjectID
+	Instance  string   `json:"instance"`  // ExportするCloudSQLのInstanceID
 	Databases []string `json:"databases"` // ExportするCloudSQLのDatabase
-	SQLURI    string   `json:"sqlURI"`    // Export時に利用するSQLを置いているGCS Path. gs://hoge/fuga.csv
+	SQLBucket string   `json:"sqlBucket"` // Export時に利用するSQLを置いているGCS Bucket. hoge
+	SQLObject string   `json:"sqlObject"` // Export時に利用するSQLを置いているGCS Object. export.sql
 	ExportURI string   `json:"exportURI"` // Export先のGCS Path. %sを入れるとyyyyMMddhhmmに置き換える gs://hoge/%s/fuga.csv
 }
 
@@ -48,8 +50,10 @@ func (api *ScheduleCloudSQLExportAPI) Post(ctx context.Context, form *ScheduleCl
 	key := store.NewKey(ctx, ds)
 	s := ScheduleCloudSQLExport{
 		ProjectID: form.ProjectID,
+		Instance:  form.Instance,
 		Databases: form.Databases,
-		SQLURI:    form.SQLURI,
+		SQLBucket: form.SQLBucket,
+		SQLObject: form.SQLObject,
 		ExportURI: form.ExportURI,
 	}
 	ss, err := store.Put(ctx, key, &s)

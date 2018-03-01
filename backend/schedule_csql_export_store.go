@@ -11,11 +11,14 @@ import (
 )
 
 // ScheduleCloudSQLExport is Cloud SQLをExportするScheduleの設定
+// +qgb
 type ScheduleCloudSQLExport struct {
 	Key           datastore.Key `json:"-" datastore:"-"`
 	ProjectID     string        `json:"projectID"` // ExportするCloudSQLが存在するProjectID
+	Instance      string        `json:"instance"`  // ExportするCloudSQLのInstanceID
 	Databases     []string      `json:"databases"` // ExportするCloudSQLのDatabase
-	SQLURI        string        `json:"sqlURI"`    // Export時に利用するSQLを置いているGCS Path. gs://hoge/fuga.csv
+	SQLBucket     string        `json:"sqlBucket"` // Export時に利用するSQLを置いているGCS Bucket. hoge
+	SQLObject     string        `json:"sqlObject"` // Export時に利用するSQLを置いているGCS Object. export.sql
 	ExportURI     string        `json:"exportURI"` // Export先のGCS Path. %sを入れるとyyyyMMddhhmmに置き換える gs://hoge/%s/fuga.csv
 	CreatedAt     time.Time     `json:"createdAt"`
 	UpdatedAt     time.Time     `json:"updatedAt"`
@@ -44,7 +47,7 @@ type ScheduleCloudSQLExportStore struct{}
 
 // Kind is Get ScheduleCloudSQLExport Kind Name
 func (store *ScheduleCloudSQLExportStore) Kind() string {
-	return "ScheduleCloudSQLExportStore"
+	return "ScheduleCloudSQLExport"
 }
 
 // NewKey is Create ScheduleCloudSQLExport Model Key
@@ -69,4 +72,25 @@ func (store *ScheduleCloudSQLExportStore) Put(ctx context.Context, key datastore
 	}
 	schedule.Key = key
 	return schedule, nil
+}
+
+// ListAll is ScheduleCloudSQLExportStore を全件取得する
+func (store *ScheduleCloudSQLExportStore) ListAll(ctx context.Context) ([]*ScheduleCloudSQLExport, error) {
+	ds, err := fromContext(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "fromContext")
+	}
+
+	var sl []*ScheduleCloudSQLExport
+	b := NewScheduleCloudSQLExportQueryBuilder(ds)
+	kl, err := ds.GetAll(ctx, b.Query(), &sl)
+	if err != nil {
+		return nil, errors.Wrap(err, "datastore.GetAll")
+	}
+
+	for i, v := range kl {
+		sl[i].Key = v
+	}
+
+	return sl, nil
 }

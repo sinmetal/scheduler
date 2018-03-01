@@ -7,3 +7,7 @@ cron:
   url: /cron/datastore-export
   schedule: every day 02:18
   timezone: Asia/Tokyo
+- description: "daily cloud sql export"
+  url: /cron/cloudsql-export
+  schedule: every day 02:18
+  timezone: Asia/Tokyo

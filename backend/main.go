@@ -36,10 +36,13 @@ func init() {
 	setUpBatch(swPlugin)
 	setupScheduleAPI(swPlugin)
 	setupScheduleDatastoreExportAPI(swPlugin)
+	setupScheduleCloudSQLExportAPI(swPlugin)
 	setUpTQBuildeQueryAPI(swPlugin)
 	setupTQDatastoreExportAPI(swPlugin)
+	setupTQCloudSQLExportAPI(swPlugin)
 	setupCronQueryAPI(swPlugin)
 	setupCronDatastoreExportAPI(swPlugin)
+	setupCronCloudSQLExportAPI(swPlugin)
 
 	ucon.HandleFunc(http.MethodPost, "/ocn/datastore-export", ReceiveOCNHandler)
 	ucon.HandleFunc(http.MethodPost, "/tq/gcs/object-to-bq", ImportBigQueryHandleFunc("datastore_imports"))

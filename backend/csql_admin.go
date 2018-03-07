@@ -46,7 +46,7 @@ type CloudSQLExportConfig struct {
 
 // Export is Cloud SQLにSQLを実行して、Cloud StorageにExportする
 func (service *CloudSQLAdminServiceImpl) Export(ctx context.Context, config *CloudSQLExportConfig) error {
-	client, err := google.DefaultClient(ctx, sqladmin.SqlserviceAdminScope)
+	client, err := google.DefaultClient(ctx, "https://www.googleapis.com/auth/cloud-platform", sqladmin.SqlserviceAdminScope)
 	if err != nil {
 		return err
 	}

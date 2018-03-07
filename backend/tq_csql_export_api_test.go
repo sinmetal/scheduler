@@ -42,12 +42,16 @@ func TestTQCloudSQLExportAPI_Post(t *testing.T) {
 	SetCloudSQLAdminService(&mock)
 
 	form := TQCloudSQLExportAPIPostRequest{
-		ProjectID: "hogeproject",
-		Instance:  "sql1",
-		Databases: []string{"db1"},
-		SQLBucket: bucket,
-		SQLObject: object,
-		ExportURI: "gs://hoge/%s/hoge.csv",
+		ProjectID:           "hogeproject",
+		Instance:            "sql1",
+		Databases:           []string{"db1"},
+		SQLBucket:           bucket,
+		SQLObject:           object,
+		ExportURI:           "gs://hoge/%s/hoge.csv",
+		BigQueryProjectID:   "hogeproject",
+		BigQueryDataset:     "hogedataset",
+		BigQueryTable:       "hogetable",
+		BigQueryTableSchema: "NAME:STRING,AGE:INTEGER",
 	}
 	b, err := json.Marshal(form)
 	if err != nil {
@@ -83,6 +87,8 @@ func TestTQCloudSQLExportAPI_Post(t *testing.T) {
 	if e, g := mock.Config.SQL, sql; e != g {
 		t.Fatalf("expected SQL is %s; got %s", e, g)
 	}
+
+	// TODO ScheduleCloudSQLExportJobのTest. time.Nowを固定していないので、yyyymmddhhmmssが分からない
 
 	// TODO time.Nowを固定していないので、yyyymmddhhmmssが入るところを固定できない
 	//if e, g := mock.Config.ExportURI, form.ExportURI; e != g {

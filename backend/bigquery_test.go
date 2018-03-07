@@ -16,12 +16,12 @@ func TestBigQueryService_BuildTableSchema(t *testing.T) {
 
 	candidates := []struct {
 		name       string
-		schemaType      string
+		schemaType string
 	}{
 		{"id", "INTEGER"},
-		{"uuid","STRING"},
-		{"client_time","DATETIME"},
-		{"db_time","DATETIME"},
+		{"uuid", "STRING"},
+		{"client_time", "DATETIME"},
+		{"db_time", "DATETIME"},
 	}
 
 	for i, v := range candidates {

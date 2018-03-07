@@ -13,16 +13,20 @@ import (
 // ScheduleCloudSQLExport is Cloud SQLをExportするScheduleの設定
 // +qgb
 type ScheduleCloudSQLExport struct {
-	Key           datastore.Key `json:"-" datastore:"-"`
-	ProjectID     string        `json:"projectID"` // ExportするCloudSQLが存在するProjectID
-	Instance      string        `json:"instance"`  // ExportするCloudSQLのInstanceID
-	Databases     []string      `json:"databases"` // ExportするCloudSQLのDatabase
-	SQLBucket     string        `json:"sqlBucket"` // Export時に利用するSQLを置いているGCS Bucket. hoge
-	SQLObject     string        `json:"sqlObject"` // Export時に利用するSQLを置いているGCS Object. export.sql
-	ExportURI     string        `json:"exportURI"` // Export先のGCS Path. %sを入れるとyyyyMMddhhmmに置き換える gs://hoge/%s/fuga.csv
-	CreatedAt     time.Time     `json:"createdAt"`
-	UpdatedAt     time.Time     `json:"updatedAt"`
-	SchemaVersion int           `json:"-"`
+	Key                 datastore.Key `json:"-" datastore:"-"`
+	ProjectID           string        `json:"projectID"`           // ExportするCloudSQLが存在するProjectID
+	Instance            string        `json:"instance"`            // ExportするCloudSQLのInstanceID
+	Databases           []string      `json:"databases"`           // ExportするCloudSQLのDatabase
+	SQLBucket           string        `json:"sqlBucket"`           // Export時に利用するSQLを置いているGCS Bucket. hoge
+	SQLObject           string        `json:"sqlObject"`           // Export時に利用するSQLを置いているGCS Object. export.sql
+	ExportURI           string        `json:"exportURI"`           // Export先のGCS Path. %sを入れるとyyyyMMddhhmmに置き換える gs://hoge/%s/fuga.csv
+	BigQueryProjectID   string        `json:"bigQueryProjectID"`   // Load先のBigQuery ProjectID
+	BigQueryDataset     string        `json:"bigQueryDataset"`     // Load先のBigQuery Dataset
+	BigQueryTable       string        `json:"bigQueryTable"`       // Load先のBigQuery Table
+	BigQueryTableSchema string        `json:"bigQueryTableSchema"` // LoadするのBigQueryTableのSchema文字列 Ex. Name:STRING,Age:INTEGER
+	CreatedAt           time.Time     `json:"createdAt"`
+	UpdatedAt           time.Time     `json:"updatedAt"`
+	SchemaVersion       int           `json:"-"`
 }
 
 var _ datastore.PropertyLoadSaver = &ScheduleCloudSQLExport{}

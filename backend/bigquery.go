@@ -2,128 +2,96 @@ package backend
 
 import (
 	"context"
-	"encoding/json"
+	"fmt"
 	"net/http"
-	"time"
+	"strings"
 
-	"github.com/favclip/ucon"
-	"github.com/favclip/ucon/swagger"
-	"github.com/pkg/errors"
+	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/bigquery/v2"
+	"google.golang.org/appengine"
 	"google.golang.org/appengine/log"
+	"google.golang.org/appengine/urlfetch"
 )
 
-// BigQueryAPI is BigQuery API
-type BigQueryAPI struct{}
+// BigQueryService is BigQuery APIのためのService
+type BigQueryService struct{}
 
-func setupBigQuery(swPlugin *swagger.Plugin) {
-	api := &BigQueryAPI{}
+// LoadFromCloudSQLExport is Cloud SQL Export CSVをBigQueryにLoadする
+func (service *BigQueryService) LoadFromCloudSQLExport(ctx context.Context, job *ScheduleCloudSQLExportJob) error {
+	log.Infof(ctx, "%v", job)
 
-	tag := swPlugin.AddTag(&swagger.Tag{Name: "BigQuery", Description: "BigQuery list"})
-	var hInfo *swagger.HandlerInfo
-
-	hInfo = swagger.NewHandlerInfo(api.Post)
-	ucon.Handle(http.MethodPost, "/bigquery", hInfo)
-	hInfo.Description, hInfo.Tags = "post to bigquery", []string{tag.Name}
-}
-
-// BigQueryAPIPostRequest is BigQuery API Post form
-type BigQueryAPIPostRequest struct {
-	ProjectID         string `json:"projectID"`
-	DstProjectID      string `json:"dstProjectID"`
-	DstDatasetID      string `json:"dstDatasetID"`
-	DstTableID        string `json:"dstTableID"`
-	Query             string `json:"query"`
-	QueryPathBucket   string `json:"queryPathBucket"`
-	QueryPathObject   string `json:"queryPathObject"`
-	CreateDisposition string `json:"createDisposition"`
-}
-
-// BigQueryAPIPostResponse is BigQuery API Post response
-type BigQueryAPIPostResponse struct {
-	JobID string `json:"jobID"`
-}
-
-// Post is BigQuery API Post Handler
-func (api *BigQueryAPI) Post(ctx context.Context, form *BigQueryAPIPostRequest) (*BigQueryAPIPostResponse, error) {
-	storageService := NewStorageService()
-
-	{
-		b, err := json.Marshal(form)
-		if err != nil {
-			log.Errorf(ctx, "Failed to request.Body to json: %v", err)
-			return nil, err
-		}
-		log.Infof(ctx, "request.Body=%s", string(b))
+	client := &http.Client{
+		Transport: &oauth2.Transport{
+			Source: google.AppEngineTokenSource(ctx, bigquery.BigqueryScope),
+			Base:   &urlfetch.Transport{Context: ctx},
+		},
 	}
 
-	if len(form.QueryPathBucket) > 1 {
-		query, err := storageService.GetObject(ctx, form.QueryPathBucket, form.QueryPathObject)
-		if err != nil {
-			log.Errorf(ctx, "Failed to Get Object From Storage: %v", err)
-			return nil, err
-		}
-		log.Infof(ctx, "query from storage=%s", query)
-		form.Query = query
-	}
-	if len(form.Query) < 1 {
-		return nil, errors.New("query is required")
-	}
-
-	ctxWithTimeout, cancel := context.WithTimeout(ctx, 30*time.Second)
-	defer cancel()
-	client, err := google.DefaultClient(ctxWithTimeout, bigquery.BigqueryScope)
+	bqs, err := bigquery.New(client)
 	if err != nil {
-		log.Errorf(ctx, "Failed to create client: %v", err)
-		return nil, err
-	}
-	bq, err := bigquery.New(client)
-	if err != nil {
-		log.Errorf(ctx, "Failed to create bigquery service: %v", err)
-		return nil, err
+		return err
 	}
 
-	job, err := bq.Jobs.Insert(form.ProjectID, &bigquery.Job{
+	ts, err := service.BuildTableSchema(job.BigQueryTableSchema)
+	if err != nil {
+		return err
+	}
+	j := &bigquery.Job{
 		Configuration: &bigquery.JobConfiguration{
-			Query: &bigquery.JobConfigurationQuery{
-				Query:    form.Query,
-				Priority: "Batch",
-				DefaultDataset: &bigquery.DatasetReference{
-					ProjectId: form.DstProjectID,
-					DatasetId: form.DstDatasetID,
+			Load: &bigquery.JobConfigurationLoad{
+				SourceUris: []string{
+					job.ExportURI,
 				},
-				AllowLargeResults: true,
-				CreateDisposition: "CreateIfNeeded",
-				WriteDisposition:  "WRITE_TRUNCATE",
 				DestinationTable: &bigquery.TableReference{
-					ProjectId: form.DstProjectID,
-					DatasetId: form.DstDatasetID,
-					TableId:   form.DstTableID,
+					ProjectId: job.BigQueryProjectID,
+					DatasetId: job.BigQueryDataset,
+					TableId:   job.BigQueryTable,
 				},
-				TimePartitioning: &bigquery.TimePartitioning{
-					Type: "DAY",
-				},
-				//UseLegacySql:    false,
-				//ForceSendFields: []string{"UseLegacySql"},
+				SourceFormat:     "CSV",
+				Schema:           ts,
+				WriteDisposition: "WRITE_TRUNCATE",
 			},
 		},
-	}).Do()
+	}
+
+	rj, err := bqs.Jobs.Insert(appengine.AppID(ctx), j).Do()
 	if err != nil {
-		log.Errorf(ctx, "Failed to insert query job: %v", err)
-		return nil, err
+		log.Warningf(ctx, "unexpected error in BigQuery Load Job Insert: %s", err)
+		return nil
 	}
+	log.Infof(ctx, "JobID=%s, Status=%s", rj.Id, rj.Status.State)
 
-	{
-		b, err := json.Marshal(job)
-		if err != nil {
-			log.Errorf(ctx, "Failed to response job marshal to json: %v", err)
-			return nil, err
+	return nil
+}
+
+// BuildTableSchema is TableSchema文字列からbigquery.TableSchemaを生成する
+// TableSchema文字列 Example Name:STRING,Age:INTEGER
+func (service *BigQueryService) BuildTableSchema(schema string) (*bigquery.TableSchema, error) {
+	result := &bigquery.TableSchema{}
+	s := strings.Split(schema, ",")
+	for _, v := range s {
+		fsc := strings.Split(v, ":")
+		if service.validateTableFieldSchema(fsc) == false {
+			return nil, fmt.Errorf("invalid TableFieldSchema. %v", fsc)
 		}
-		log.Infof(ctx, "%s", string(b))
+		result.Fields = append(result.Fields,
+			&bigquery.TableFieldSchema{
+				Name: fsc[0],
+				Type: fsc[1],
+			})
 	}
 
-	return &BigQueryAPIPostResponse{
-		JobID: job.Id,
-	}, nil
+	return result, nil
+}
+
+// validateTableFieldSchema is TableSchema文字列がValidか確認する
+// TableSchema文字列 Example Name:STRING,Age:INTEGER
+func (service *BigQueryService) validateTableFieldSchema(fieldSchema []string) bool {
+	if len(fieldSchema) != 2 {
+		// 0 : Column Name, 1 : Type
+		return false
+	}
+	// TODO TypeがBigQueryの許容範囲のものか確認する
+	return true
 }

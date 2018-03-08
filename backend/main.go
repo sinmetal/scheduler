@@ -46,6 +46,7 @@ func init() {
 
 	ucon.HandleFunc(http.MethodPost, "/ocn/datastore-export", ReceiveOCNHandler)
 	ucon.HandleFunc(http.MethodPost, "/tq/gcs/object-to-bq", ImportBigQueryHandleFunc("datastore_imports"))
+	ucon.HandleFunc(http.MethodPost, "/ocn/cloudsql-export", ReceiveCloudSQLExportOCNHandler)
 
 	ucon.DefaultMux.Prepare()
 	http.Handle("/", ucon.DefaultMux)

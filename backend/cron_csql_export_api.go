@@ -36,12 +36,16 @@ func (api *CronCloudSQLExportAPI) Get(ctx context.Context) error {
 	for _, v := range l {
 		// TODO 実行すべきかのハンドリングを追加
 		err := tq.Call(ctx, &TQCloudSQLExportAPIPostRequest{
-			ProjectID: v.ProjectID,
-			Instance:  v.Instance,
-			Databases: v.Databases,
-			SQLBucket: v.SQLBucket,
-			SQLObject: v.SQLObject,
-			ExportURI: v.ExportURI,
+			ProjectID:           v.ProjectID,
+			Instance:            v.Instance,
+			Databases:           v.Databases,
+			SQLBucket:           v.SQLBucket,
+			SQLObject:           v.SQLObject,
+			ExportURI:           v.ExportURI,
+			BigQueryProjectID:   v.BigQueryProjectID,
+			BigQueryDataset:     v.BigQueryDataset,
+			BigQueryTable:       v.BigQueryTable,
+			BigQueryTableSchema: v.BigQueryTableSchema,
 		})
 		if err != nil {
 			log.Errorf(ctx, "failed %v, %+v", v.Key, err)

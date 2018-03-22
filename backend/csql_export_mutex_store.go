@@ -74,7 +74,7 @@ func (store *CloudSQLExportMutexStore) Lock(ctx context.Context, projectID strin
 				return errors.Wrap(err, fmt.Sprintf("failed datastore.Get. key = %v", key))
 			}
 		}
-		if e.ScheduleCloudSQLExportJobKey != nil && e.ScheduleCloudSQLExportJobKey.Equal(jobKey) {
+		if e.ScheduleCloudSQLExportJobKey != nil && e.ScheduleCloudSQLExportJobKey.Equal(jobKey) == false {
 			// 誰かが使ってる！
 			return ErrCloudSQLExportMutexCollision
 		}
@@ -107,7 +107,7 @@ func (store *CloudSQLExportMutexStore) Unlock(ctx context.Context, projectID str
 		if err := tx.Get(key, &e); err != nil {
 			return errors.Wrap(err, fmt.Sprintf("failed datastore.Get. key = %v", key))
 		}
-		if e.ScheduleCloudSQLExportJobKey != nil &&  e.ScheduleCloudSQLExportJobKey.Equal(jobKey) == false {
+		if e.ScheduleCloudSQLExportJobKey != nil && e.ScheduleCloudSQLExportJobKey.Equal(jobKey) == false {
 			// 誰かが使ってる！
 			return ErrCloudSQLExportMutexCollision
 		}

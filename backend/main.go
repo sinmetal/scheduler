@@ -40,6 +40,7 @@ func init() {
 	setUpTQBuildeQueryAPI(swPlugin)
 	setupTQDatastoreExportAPI(swPlugin)
 	setupTQCloudSQLExportAPI(swPlugin)
+	setupTQCloudSQLExportAfterAPI(swPlugin)
 	setupCronQueryAPI(swPlugin)
 	setupCronDatastoreExportAPI(swPlugin)
 	setupCronCloudSQLExportAPI(swPlugin)

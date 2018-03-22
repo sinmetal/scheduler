@@ -76,7 +76,7 @@ func (api *TQCloudSQLExportAPI) Post(ctx context.Context, form *TQCloudSQLExport
 	}
 	log.Infof(ctx, "query from storage=%s", query)
 
-	_, err = jstore.Put(ctx, &ScheduleCloudSQLExportJob{
+	job, err := jstore.Put(ctx, &ScheduleCloudSQLExportJob{
 		ProjectID:           form.ProjectID,
 		Instance:            form.Instance,
 		Databases:           form.Databases,
@@ -94,7 +94,7 @@ func (api *TQCloudSQLExportAPI) Post(ctx context.Context, form *TQCloudSQLExport
 	}
 
 	s := NewCloudSQLAdminService()
-	err = s.Export(ctx, &CloudSQLExportConfig{
+	op, err := s.Export(ctx, &CloudSQLExportConfig{
 		ProjectID: form.ProjectID,
 		Instance:  form.Instance,
 		Databases: form.Databases,
@@ -103,6 +103,17 @@ func (api *TQCloudSQLExportAPI) Post(ctx context.Context, form *TQCloudSQLExport
 	})
 	if err != nil {
 		log.Errorf(ctx, "Failed to Cloud SQL Export:\n %+v", err)
+		return err
+	}
+	after := TQCloudSQLExportAfterAPI{}
+	err = after.Call(ctx, &TQCloudSQLExportAPIAfterPostRequest{
+		ProjectID: form.ProjectID,
+		Instance:  form.Instance,
+		Operation: op.Name,
+		JobKey:    job.Key.Encode(),
+	})
+	if err != nil {
+		log.Errorf(ctx, "Failed to Call TQCloudSQLExportAfterAPI:\n %+v", err)
 		return err
 	}
 

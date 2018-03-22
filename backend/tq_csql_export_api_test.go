@@ -2,7 +2,6 @@ package backend
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -11,17 +10,6 @@ import (
 
 	"github.com/favclip/testerator"
 )
-
-type MockCloudSQLAdminService struct {
-	CallExportCount int
-	Config          *CloudSQLExportConfig
-}
-
-func (s *MockCloudSQLAdminService) Export(ctx context.Context, form *CloudSQLExportConfig) error {
-	s.CallExportCount++
-	s.Config = form
-	return nil
-}
 
 func TestTQCloudSQLExportAPI_Post(t *testing.T) {
 	inst, ctx, err := testerator.SpinUp()

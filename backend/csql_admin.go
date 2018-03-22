@@ -13,7 +13,8 @@ import (
 
 // CloudSQLAdminService is Cloud SQLのAdmin APIに関するService
 type CloudSQLAdminService interface {
-	Export(ctx context.Context, config *CloudSQLExportConfig) error
+	Export(ctx context.Context, config *CloudSQLExportConfig) (*sqladmin.Operation, error)
+	GetOp(ctx context.Context, projectID string, operation string) (*sqladmin.Operation, error)
 }
 
 // CloudSQLAdminServiceImpl is Cloud SQL Adminの実装をぶらさげるstruct
@@ -45,15 +46,15 @@ type CloudSQLExportConfig struct {
 }
 
 // Export is Cloud SQLにSQLを実行して、Cloud StorageにExportする
-func (service *CloudSQLAdminServiceImpl) Export(ctx context.Context, config *CloudSQLExportConfig) error {
+func (service *CloudSQLAdminServiceImpl) Export(ctx context.Context, config *CloudSQLExportConfig) (*sqladmin.Operation, error) {
 	client, err := google.DefaultClient(ctx, "https://www.googleapis.com/auth/cloud-platform", sqladmin.SqlserviceAdminScope)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	admin, err := sqladmin.New(client)
 	if err != nil {
-		return errors.Wrap(err, "failed sqladmin.New")
+		return nil, errors.Wrap(err, "failed sqladmin.New")
 	}
 
 	param := sqladmin.InstancesExportRequest{
@@ -68,13 +69,33 @@ func (service *CloudSQLAdminServiceImpl) Export(ctx context.Context, config *Clo
 	}
 	op, err := admin.Instances.Export(config.ProjectID, config.Instance, &param).Do()
 	if err != nil {
-		return errors.Wrap(err, "failed sqladmin.Instances.Export")
+		return nil, errors.Wrap(err, "failed sqladmin.Instances.Export")
 	}
 
 	log.Infof(ctx, "Cloud SQL Export Response Status Code : %d, Name : %s", op.HTTPStatusCode, op.Name)
 	if op.HTTPStatusCode != http.StatusOK {
-		return fmt.Errorf("Cloud SQL Export Response Status Code = %d", op.HTTPStatusCode)
+		return nil, fmt.Errorf("Cloud SQL Export Response Status Code = %d", op.HTTPStatusCode)
 	}
 
-	return nil
+	return op, nil
+}
+
+// GetOp is 指定したOperationを取得する
+func (service *CloudSQLAdminServiceImpl) GetOp(ctx context.Context, projectID string, operation string) (*sqladmin.Operation, error) {
+	client, err := google.DefaultClient(ctx, sqladmin.SqlserviceAdminScope)
+	if err != nil {
+		return nil, err
+	}
+
+	admin, err := sqladmin.New(client)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed sqladmin.New")
+	}
+
+	op, err := admin.Operations.Get(projectID, operation).Do()
+	if err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("failed sqladmin.Operations.Get. projectID=%s,operation=%s", projectID, operation))
+	}
+
+	return op, nil
 }

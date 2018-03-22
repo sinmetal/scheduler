@@ -24,11 +24,16 @@ func (s *MockCloudSQLAdminService) Export(ctx context.Context, form *CloudSQLExp
 }
 
 func TestTQCloudSQLExportAPI_Post(t *testing.T) {
-	inst, _, err := testerator.SpinUp()
+	inst, ctx, err := testerator.SpinUp()
 	if err != nil {
 		t.Fatal(err.Error())
 	}
 	defer testerator.SpinDown()
+
+	ds, err := fromContext(ctx)
+	if err != nil {
+		t.Fatalf("%+v\n", err)
+	}
 
 	const bucket = "hogebucket"
 	const object = "hogeobject"
@@ -94,4 +99,12 @@ func TestTQCloudSQLExportAPI_Post(t *testing.T) {
 	//if e, g := mock.Config.ExportURI, form.ExportURI; e != g {
 	//	t.Fatalf("expected ExportURI is %s; got %s", e, g)
 	//}
+
+	mustore := CloudSQLExportMutexStore{}
+	var e CloudSQLExportMutex
+	muKey := mustore.Key(ctx, ds, form.ProjectID, form.Instance)
+	err = ds.Get(ctx, muKey, &e)
+	if err != nil {
+		t.Fatalf("failed Get CloudSQLExportMutexStore. %s/%s", form.ProjectID, form.Instance)
+	}
 }

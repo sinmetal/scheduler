@@ -48,6 +48,25 @@ type TQCloudSQLExportAPIPostRequest struct {
 // Post is Task Queue Handler
 func (api *TQCloudSQLExportAPI) Post(ctx context.Context, form *TQCloudSQLExportAPIPostRequest) error {
 	log.Infof(ctx, "request body = %v", form)
+	ds, err := fromContext(ctx)
+	if err != nil {
+		log.Errorf(ctx, "Failed fromContext:\n %+v", err)
+		return err
+	}
+
+	jstore := ScheduleCloudSQLExportJobStore{}
+
+	// Go forward only when can grasp Mutex
+	jobKey := jstore.Key(ctx, ds, form.ExportURI)
+	mustore := CloudSQLExportMutexStore{}
+	if err := mustore.Lock(ctx, form.ProjectID, form.Instance, jobKey); err != nil {
+		if errors.Cause(err) == ErrCloudSQLExportMutexCollision {
+			log.Infof(ctx, "Could not grab CloudSQLExportMutex")
+			return err
+		}
+		log.Errorf(ctx, "failed CloudSQLExportMutexStore.Lock() targetProjectID=%s, targetInstace=%s", form.ProjectID, form.Instance)
+		return errors.Wrap(err, "failed CloudSQLExportMutexStore.Lock")
+	}
 
 	storageService := NewStorageService()
 	query, err := storageService.GetObject(ctx, form.SQLBucket, form.SQLObject)
@@ -57,17 +76,13 @@ func (api *TQCloudSQLExportAPI) Post(ctx context.Context, form *TQCloudSQLExport
 	}
 	log.Infof(ctx, "query from storage=%s", query)
 
-	const dateLayout = "20060102150405"
-	y := time.Now().Format(dateLayout)
-	euri := fmt.Sprintf(form.ExportURI, y)
-	js := ScheduleCloudSQLExportJobStore{}
-	_, err = js.Put(ctx, &ScheduleCloudSQLExportJob{
+	_, err = jstore.Put(ctx, &ScheduleCloudSQLExportJob{
 		ProjectID:           form.ProjectID,
 		Instance:            form.Instance,
 		Databases:           form.Databases,
 		SQLBucket:           form.SQLBucket,
 		SQLObject:           form.SQLObject,
-		ExportURI:           euri,
+		ExportURI:           form.ExportURI,
 		BigQueryProjectID:   form.BigQueryProjectID,
 		BigQueryDataset:     form.BigQueryDataset,
 		BigQueryTable:       form.BigQueryTable,
@@ -84,7 +99,7 @@ func (api *TQCloudSQLExportAPI) Post(ctx context.Context, form *TQCloudSQLExport
 		Instance:  form.Instance,
 		Databases: form.Databases,
 		SQL:       query,
-		ExportURI: euri,
+		ExportURI: form.ExportURI,
 	})
 	if err != nil {
 		log.Errorf(ctx, "Failed to Cloud SQL Export:\n %+v", err)
@@ -96,6 +111,10 @@ func (api *TQCloudSQLExportAPI) Post(ctx context.Context, form *TQCloudSQLExport
 
 // Call is Add to Cloud SQL Export Task
 func (api *TQCloudSQLExportAPI) Call(ctx context.Context, form *TQCloudSQLExportAPIPostRequest) error {
+	const dateLayout = "20060102150405"
+	y := time.Now().Format(dateLayout)
+	form.ExportURI = fmt.Sprintf(form.ExportURI, y)
+
 	b, err := json.Marshal(form)
 	if err != nil {
 		return err

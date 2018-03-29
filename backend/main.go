@@ -37,6 +37,7 @@ func init() {
 	setupScheduleAPI(swPlugin)
 	setupScheduleDatastoreExportAPI(swPlugin)
 	setupScheduleCloudSQLExportAPI(swPlugin)
+	setupStorageBQLoadConfigAPI(swPlugin)
 	setUpTQBuildeQueryAPI(swPlugin)
 	setupTQDatastoreExportAPI(swPlugin)
 	setupTQCloudSQLExportAPI(swPlugin)

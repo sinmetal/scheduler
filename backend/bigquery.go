@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/bigquery/v2"
@@ -20,18 +21,6 @@ type BigQueryService struct{}
 // LoadFromCloudSQLExport is Cloud SQL Export CSVをBigQueryにLoadする
 func (service *BigQueryService) LoadFromCloudSQLExport(ctx context.Context, job *ScheduleCloudSQLExportJob) error {
 	log.Infof(ctx, "%v", job)
-
-	client := &http.Client{
-		Transport: &oauth2.Transport{
-			Source: google.AppEngineTokenSource(ctx, bigquery.BigqueryScope),
-			Base:   &urlfetch.Transport{Context: ctx},
-		},
-	}
-
-	bqs, err := bigquery.New(client)
-	if err != nil {
-		return err
-	}
 
 	ts, err := service.BuildTableSchema(job.BigQueryTableSchema)
 	if err != nil {
@@ -55,12 +44,10 @@ func (service *BigQueryService) LoadFromCloudSQLExport(ctx context.Context, job 
 		},
 	}
 
-	rj, err := bqs.Jobs.Insert(appengine.AppID(ctx), j).Do()
+	_, err = service.insertLoadJob(ctx, j)
 	if err != nil {
-		log.Warningf(ctx, "unexpected error in BigQuery Load Job Insert: %s", err)
-		return nil
+		return err
 	}
-	log.Infof(ctx, "JobID=%s, Status=%s", rj.Id, rj.Status.State)
 
 	return nil
 }
@@ -94,4 +81,62 @@ func (service *BigQueryService) validateTableFieldSchema(fieldSchema []string) b
 	}
 	// TODO TypeがBigQueryの許容範囲のものか確認する
 	return true
+}
+
+// BigQueryLoadWithAutodetectParam is LoadWithAutodetect Param
+type BigQueryLoadWithAutodetectParam struct {
+	CloudStorageURI   string
+	BigQueryProjectID string
+	BigQueryDataset   string
+	BigQueryTable     string
+	SourceFormat      string
+}
+
+// LoadWithAutodetect is BigQuery.LoadをAutodetectで実行する
+func (service *BigQueryService) LoadWithAutodetect(ctx context.Context, param *BigQueryLoadWithAutodetectParam) error {
+	j := &bigquery.Job{
+		Configuration: &bigquery.JobConfiguration{
+			Load: &bigquery.JobConfigurationLoad{
+				SourceUris: []string{
+					param.CloudStorageURI,
+				},
+				DestinationTable: &bigquery.TableReference{
+					ProjectId: param.BigQueryProjectID,
+					DatasetId: param.BigQueryDataset,
+					TableId:   param.BigQueryTable,
+				},
+				SourceFormat:     param.SourceFormat,
+				Autodetect:       true,
+				WriteDisposition: "WRITE_TRUNCATE",
+			},
+		},
+	}
+
+	_, err := service.insertLoadJob(ctx, j)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (service *BigQueryService) insertLoadJob(ctx context.Context, j *bigquery.Job) (*bigquery.Job, error) {
+	client := &http.Client{
+		Transport: &oauth2.Transport{
+			Source: google.AppEngineTokenSource(ctx, bigquery.BigqueryScope),
+			Base:   &urlfetch.Transport{Context: ctx},
+		},
+	}
+
+	bqs, err := bigquery.New(client)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed bigquery.New")
+	}
+
+	rj, err := bqs.Jobs.Insert(appengine.AppID(ctx), j).Do()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed bigquery.Jobs.Insert")
+	}
+	log.Infof(ctx, "JobID=%s, Status=%s", rj.Id, rj.Status.State)
+	return rj, nil
 }

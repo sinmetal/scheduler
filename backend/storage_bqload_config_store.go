@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"go.mercari.io/datastore"
 )
@@ -47,15 +46,11 @@ func (store *StorageBQLoadConfigStore) Kind() string {
 	return "StorageBQLoadConfig"
 }
 
-// NewKey is Create StorageBQLoadConfig Key
-// KeyNameとしてUUIDを利用
-func (store *StorageBQLoadConfigStore) NewKey(ctx context.Context, client datastore.Client) datastore.Key {
-	return client.NameKey(store.Kind(), uuid.New().String(), nil)
-}
-
 // Key is Create StorageBQLoadConfig Key
-func (store *StorageBQLoadConfigStore) Key(ctx context.Context, client datastore.Client, id string) datastore.Key {
-	return client.NameKey(store.Kind(), id, nil)
+// Keyの値にはCloud StorageのBucketを利用する
+// OCNを受け取った時に、どこにLoadするかを見るためにEntityを取得するため
+func (store *StorageBQLoadConfigStore) Key(ctx context.Context, client datastore.Client, bucket string) datastore.Key {
+	return client.NameKey(store.Kind(), bucket, nil)
 }
 
 // Put is StorageBQLoadConfig をDatastoreにPutする
@@ -71,4 +66,19 @@ func (store *StorageBQLoadConfigStore) Put(ctx context.Context, key datastore.Ke
 	config.Key = key
 
 	return config, nil
+}
+
+// Get is StorageBQLoadConfig をDatastoreからGetする
+func (store *StorageBQLoadConfigStore) Get(ctx context.Context, key datastore.Key) (*StorageBQLoadConfig, error) {
+	ds, err := fromContext(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "fromContext")
+	}
+
+	var e StorageBQLoadConfig
+	if err := ds.Get(ctx, key, &e); err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("datastore.Get. key=%+v", key))
+	}
+	e.Key = key
+	return &e, nil
 }

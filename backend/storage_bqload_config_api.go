@@ -48,7 +48,7 @@ func (api *StorageBQLoadConfigAPI) Post(ctx context.Context, form *StorageBQLoad
 		DstBigQueryProjectID: form.DstBigQueryProjectID,
 		DstBigQueryDataset:   form.DstBigQueryDataset,
 	}
-	key := store.NewKey(ctx, ds)
+	key := store.Key(ctx, ds, form.FrmStorageBucket)
 	sc, err := store.Put(ctx, key, config)
 	if err != nil {
 		return nil, err

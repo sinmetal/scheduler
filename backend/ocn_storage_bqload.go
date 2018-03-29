@@ -2,17 +2,18 @@ package backend
 
 import (
 	"context"
-	"net/http"
-
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"strings"
+
 	"github.com/favclip/ds2bq"
 	"go.mercari.io/datastore"
 	"google.golang.org/appengine/log"
 )
 
-// ReceiveCloudSQLExportOCNHandler is Cloud SQL ExportのファイルがCloud Storageに入った時にOCNを受け取り、BigQueryにUploadするためのHandler
-func ReceiveCloudSQLExportOCNHandler(ctx context.Context, w http.ResponseWriter, r *http.Request) {
+// ReceiveStorageBQLoadOCNHandler is Cloud Storage load to BigQueryのOCNを受け取るためのHandler
+func ReceiveStorageBQLoadOCNHandler(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	obj, err := ds2bq.DecodeGCSObject(r.Body)
 	if err != nil {
 		log.Errorf(ctx, "ds2bq: failed to decode request: %s", err)
@@ -36,30 +37,35 @@ func ReceiveCloudSQLExportOCNHandler(ctx context.Context, w http.ResponseWriter,
 		return
 	}
 
-	gp := fmt.Sprintf("gs://%s/%s", obj.Bucket, obj.Name)
-	store := ScheduleCloudSQLExportJobStore{}
-	key := store.Key(ctx, ds, gp)
-	job, err := store.Get(ctx, key)
+	store := StorageBQLoadConfigStore{}
+	key := store.Key(ctx, ds, obj.Bucket)
+	config, err := store.Get(ctx, key)
 	if err == datastore.ErrNoSuchEntity {
 		log.Warningf(ctx, "notfound job entity. obj = %s", obj.SelfLink)
 		// TODO 何か通知があった方がいいかも？
 		w.WriteHeader(http.StatusOK)
 		return
 	} else if err != nil {
-		log.Errorf(ctx, "failed ScheduleCloudSQLExportJobStore.Get. Key = %v", key)
+		log.Errorf(ctx, "failed StorageBQLoadConfigStore.Get. Key=%v,err=%+v", key, err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	bqs := BigQueryService{}
-	if err := bqs.LoadFromCloudSQLExport(ctx, job); err != nil {
-		log.Errorf(ctx, "failed bigquery.LoadFromCloudSQLExport. JobEntityKey = %v", key)
+	t := strings.Replace(obj.Name, ".csv", "", -1)
+	bq := BigQueryService{}
+	if err := bq.LoadWithAutodetect(ctx, &BigQueryLoadWithAutodetectParam{
+		CloudStorageURI:   fmt.Sprintf("gs://%s/%s", obj.Bucket, obj.Name),
+		BigQueryProjectID: config.DstBigQueryProjectID,
+		BigQueryDataset:   config.DstBigQueryDataset,
+		BigQueryTable:     t,
+		SourceFormat:      "CSV",
+	}); err != nil {
+		log.Errorf(ctx, "failed bigquery.LoadWithAutodetect. ConfigKey=%v, err=%+v", key, err)
 
 		// OCNがリトライし続けてしまうので、200 OKを返す
 		// TODO 何か通知があった方がいいかも？
 		w.WriteHeader(http.StatusOK)
 		return
 	}
-
 	w.WriteHeader(http.StatusOK)
 }

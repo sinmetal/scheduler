@@ -37,6 +37,7 @@ func init() {
 	setupScheduleAPI(swPlugin)
 	setupScheduleDatastoreExportAPI(swPlugin)
 	setupScheduleCloudSQLExportAPI(swPlugin)
+	setupStorageBQLoadConfigAPI(swPlugin)
 	setUpTQBuildeQueryAPI(swPlugin)
 	setupTQDatastoreExportAPI(swPlugin)
 	setupTQCloudSQLExportAPI(swPlugin)
@@ -48,6 +49,7 @@ func init() {
 	ucon.HandleFunc(http.MethodPost, "/ocn/datastore-export", ReceiveOCNHandler)
 	ucon.HandleFunc(http.MethodPost, "/tq/gcs/object-to-bq", ImportBigQueryHandleFunc("datastore_imports"))
 	ucon.HandleFunc(http.MethodPost, "/ocn/cloudsql-export", ReceiveCloudSQLExportOCNHandler)
+	ucon.HandleFunc(http.MethodPost, "/ocn/storage-bqload", ReceiveStorageBQLoadOCNHandler)
 
 	ucon.DefaultMux.Prepare()
 	http.Handle("/", ucon.DefaultMux)

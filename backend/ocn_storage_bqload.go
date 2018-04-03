@@ -14,6 +14,9 @@ import (
 
 // ReceiveStorageBQLoadOCNHandler is Cloud Storage load to BigQueryのOCNを受け取るためのHandler
 func ReceiveStorageBQLoadOCNHandler(ctx context.Context, w http.ResponseWriter, r *http.Request) {
+	h := ds2bq.NewGCSHeader(r)
+	log.Infof(ctx, "header: %+v", h)
+
 	obj, err := ds2bq.DecodeGCSObject(r.Body)
 	if err != nil {
 		log.Errorf(ctx, "ds2bq: failed to decode request: %s", err)
@@ -29,6 +32,12 @@ func ReceiveStorageBQLoadOCNHandler(ctx context.Context, w http.ResponseWriter, 
 		return
 	}
 	log.Infof(ctx, "obj:%s\n", j)
+
+	if h.ResourceState != "exists" {
+		log.Infof(ctx, "gs://%s/%s is not exists", obj.Bucket, obj.Name)
+		w.WriteHeader(http.StatusOK)
+		return
+	}
 
 	ds, err := fromContext(ctx)
 	if err != nil {

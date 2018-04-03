@@ -12,6 +12,9 @@ import (
 func ReceiveOCNHandler(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	const tqURL = "/tq/gcs/object-to-bq"
 
+	h := ds2bq.NewGCSHeader(r)
+	log.Infof(ctx, "header: %+v", h)
+
 	obj, err := ds2bq.DecodeGCSObject(r.Body)
 	if err != nil {
 		log.Errorf(ctx, "ds2bq: failed to decode request: %s", err)
@@ -19,6 +22,12 @@ func ReceiveOCNHandler(ctx context.Context, w http.ResponseWriter, r *http.Reque
 		return
 	}
 	defer r.Body.Close()
+
+	if h.ResourceState != "exists" {
+		log.Infof(ctx, "gs://%s/%s is not exists", obj.Bucket, obj.Name)
+		w.WriteHeader(http.StatusOK)
+		return
+	}
 
 	store := ScheduleDatastoreExportStore{}
 	sl, err := store.QueryByBucket(ctx, obj.Bucket)

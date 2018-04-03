@@ -13,6 +13,9 @@ import (
 
 // ReceiveCloudSQLExportOCNHandler is Cloud SQL ExportのファイルがCloud Storageに入った時にOCNを受け取り、BigQueryにUploadするためのHandler
 func ReceiveCloudSQLExportOCNHandler(ctx context.Context, w http.ResponseWriter, r *http.Request) {
+	h := ds2bq.NewGCSHeader(r)
+	log.Infof(ctx, "header: %+v", h)
+
 	obj, err := ds2bq.DecodeGCSObject(r.Body)
 	if err != nil {
 		log.Errorf(ctx, "ds2bq: failed to decode request: %s", err)
@@ -20,6 +23,12 @@ func ReceiveCloudSQLExportOCNHandler(ctx context.Context, w http.ResponseWriter,
 		return
 	}
 	defer r.Body.Close()
+
+	if h.ResourceState != "exists" {
+		log.Infof(ctx, "gs://%s/%s is not exists", obj.Bucket, obj.Name)
+		w.WriteHeader(http.StatusOK)
+		return
+	}
 
 	j, err := json.Marshal(obj)
 	if err != nil {

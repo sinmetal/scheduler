@@ -85,23 +85,23 @@ type pubSubMessageData struct {
 
 // PubSubMessageData is PubSubからPushされたMessageのObjectに関連する内容
 type PubSubMessageData struct {
-	Kind                    string    `json:"kind"`
-	ID                      string    `json:"id"`
-	SelfLink                string    `json:"selfLink"`
-	Name                    string    `json:"name"`
-	Bucket                  string    `json:"bucket"`
-	Generation              int       `json:"generation"`
-	Metageneration          int       `json:"metageneration"`
-	ContentType             string    `json:"contentType"`
-	TimeCreated             time.Time `json:"timeCreated"`
-	Updated                 time.Time `json:"updated"`
-	StorageClass            string    `json:"storageClass"`
-	TimeStorageClassUpdated time.Time `json:"timeStorageClassUpdated"`
-	Size                    int       `json:"size"`
-	MD5Hash                 string    `json:"md5hash"`
-	MediaLink               string    `json:"mediaLink"`
-	CRC32C                  string    `json:"crc32c"`
-	Etag                    string    `json:"etag"`
+	Kind                    string           `json:"kind"`
+	ID                      string           `json:"id"`
+	SelfLink                string           `json:"selfLink"`
+	Name                    string           `json:"name"`
+	Bucket                  string           `json:"bucket"`
+	Generation              int              `json:"generation"`
+	Metageneration          int              `json:"metageneration"`
+	ContentType             string           `json:"contentType"`
+	TimeCreated             time.Time        `json:"timeCreated"`
+	Updated                 time.Time        `json:"updated"`
+	StorageClass            StorageClassType `json:"storageClass"`
+	TimeStorageClassUpdated time.Time        `json:"timeStorageClassUpdated"`
+	Size                    int              `json:"size"`
+	MD5Hash                 string           `json:"md5hash"`
+	MediaLink               string           `json:"mediaLink"`
+	CRC32C                  string           `json:"crc32c"`
+	Etag                    string           `json:"etag"`
 }
 
 // PubSubAttributes is PubSubからPushされたMessageのObjectの変更に関連する内容
@@ -151,12 +151,17 @@ func ReadPubSubBody(body []byte) (*PubSubBody, error) {
 	psmd.ContentType = md.ContentType
 	psmd.TimeCreated = md.TimeCreated
 	psmd.Updated = md.Updated
-	psmd.StorageClass = md.StorageClass
 	psmd.TimeStorageClassUpdated = md.TimeStorageClassUpdated
 	psmd.MD5Hash = md.MD5Hash
 	psmd.MediaLink = md.MediaLink
 	psmd.CRC32C = md.CRC32C
 	psmd.Etag = md.Etag
+
+	sct, err := ParseStorageClassType(md.StorageClass)
+	if err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("failed ParseStorageClassType. v=%s", md.StorageClass))
+	}
+	psmd.StorageClass = sct
 
 	size, err := strconv.Atoi(md.Size)
 	if err != nil {

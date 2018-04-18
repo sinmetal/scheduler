@@ -100,7 +100,7 @@ func TestReadPubSubBody(t *testing.T) {
 	if msg.Message.Data.Updated.IsZero() {
 		t.Fatalf("Message.Data.Updated is Zero")
 	}
-	if e, g := "STANDARD", msg.Message.Data.StorageClass; e != g {
+	if e, g := Standard, msg.Message.Data.StorageClass; e != g {
 		t.Fatalf("expected Message.Data.StorageClass = %s; got %s", e, g)
 	}
 	if msg.Message.Data.TimeStorageClassUpdated.IsZero() {

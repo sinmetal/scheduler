@@ -58,7 +58,7 @@ type PubSubMessage struct {
 
 type pubSubMessage struct {
 	Data        string           `json:"data"`
-	Attributes  PubSubAttributes `json:"attributes"`
+	Attributes  pubSubAttributes `json:"attributes"`
 	MessageID   string           `json:"messageId"`
 	PublishTime time.Time        `json:"publishTime"`
 }
@@ -106,6 +106,16 @@ type PubSubMessageData struct {
 
 // PubSubAttributes is PubSubからPushされたMessageのObjectの変更に関連する内容
 type PubSubAttributes struct {
+	BucketID           string                       `json:"bucketId"`
+	ObjectID           string                       `json:"objectId"`
+	ObjectGeneration   string                       `json:"objectGeneration"`
+	EventTime          time.Time                    `json:"eventTime"`
+	EventType          PubSubStorageNotifyEventType `json:"eventType"`
+	PayloadFormat      string                       `json:"payloadFormat"`
+	NotificationConfig string                       `json:"notificationConfig"`
+}
+
+type pubSubAttributes struct {
 	BucketID           string    `json:"bucketId"`
 	ObjectID           string    `json:"objectId"`
 	ObjectGeneration   string    `json:"objectGeneration"`
@@ -166,10 +176,24 @@ func ReadPubSubBody(body []byte) (*PubSubBody, error) {
 	}
 	psmd.Metageneration = mg
 
+	a := PubSubAttributes{
+		BucketID:           b.Message.Attributes.BucketID,
+		ObjectID:           b.Message.Attributes.ObjectID,
+		ObjectGeneration:   b.Message.Attributes.ObjectGeneration,
+		EventTime:          b.Message.Attributes.EventTime,
+		PayloadFormat:      b.Message.Attributes.PayloadFormat,
+		NotificationConfig: b.Message.Attributes.NotificationConfig,
+	}
+	et, err := ParsePubSubStorageNotifyEventType(b.Message.Attributes.EventType)
+	if err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("failed ParsePubSubStorageNotifyEventType. v=%s", b.Message.Attributes.EventType))
+	}
+	a.EventType = et
+
 	return &PubSubBody{
 		Message: PubSubMessage{
 			Data:        psmd,
-			Attributes:  b.Message.Attributes,
+			Attributes:  a,
 			MessageID:   b.Message.MessageID,
 			PublishTime: b.Message.PublishTime,
 		},

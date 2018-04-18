@@ -60,7 +60,7 @@ func TestReadPubSubBody(t *testing.T) {
 	if msg.Message.Attributes.EventTime.IsZero() {
 		t.Fatalf("Message.Attributes.EventTime is Zero")
 	}
-	if e, g := "OBJECT_FINALIZE", msg.Message.Attributes.EventType; e != g {
+	if e, g := "ObjectFinalize", msg.Message.Attributes.EventType.String(); e != g {
 		t.Fatalf("expected Message.Attributes.EventType = %s; got %s", e, g)
 	}
 	if e, g := "JSON_API_V1", msg.Message.Attributes.PayloadFormat; e != g {

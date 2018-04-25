@@ -27,6 +27,8 @@ func ReceivePubSubSampleHandler(ctx context.Context, w http.ResponseWriter, r *h
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	log.Infof(ctx, "%s", string(body))
+
 	msg, err := ReadPubSubBody(body)
 	if err != nil {
 		log.Errorf(ctx, "%+v", err)
@@ -106,23 +108,27 @@ type PubSubMessageData struct {
 
 // PubSubAttributes is PubSubからPushされたMessageのObjectの変更に関連する内容
 type PubSubAttributes struct {
-	BucketID           string                       `json:"bucketId"`
-	ObjectID           string                       `json:"objectId"`
-	ObjectGeneration   string                       `json:"objectGeneration"`
-	EventTime          time.Time                    `json:"eventTime"`
-	EventType          PubSubStorageNotifyEventType `json:"eventType"`
-	PayloadFormat      string                       `json:"payloadFormat"`
-	NotificationConfig string                       `json:"notificationConfig"`
+	BucketID                string                       `json:"bucketId"`
+	ObjectID                string                       `json:"objectId"`
+	ObjectGeneration        string                       `json:"objectGeneration"`
+	EventTime               time.Time                    `json:"eventTime"`
+	EventType               PubSubStorageNotifyEventType `json:"eventType"`
+	PayloadFormat           string                       `json:"payloadFormat"`
+	NotificationConfig      string                       `json:"notificationConfig"`
+	OverwrittenByGeneration int                          `json:"overwrittenByGeneration"`
+	OverwroteGeneration     int                          `json:"overwroteGeneration"`
 }
 
 type pubSubAttributes struct {
-	BucketID           string    `json:"bucketId"`
-	ObjectID           string    `json:"objectId"`
-	ObjectGeneration   string    `json:"objectGeneration"`
-	EventTime          time.Time `json:"eventTime"`
-	EventType          string    `json:"eventType"`
-	PayloadFormat      string    `json:"payloadFormat"`
-	NotificationConfig string    `json:"notificationConfig"`
+	BucketID                string    `json:"bucketId"`
+	ObjectID                string    `json:"objectId"`
+	ObjectGeneration        string    `json:"objectGeneration"`
+	EventTime               time.Time `json:"eventTime"`
+	EventType               string    `json:"eventType"`
+	PayloadFormat           string    `json:"payloadFormat"`
+	NotificationConfig      string    `json:"notificationConfig"`
+	OverwrittenByGeneration int       `json:"overwrittenByGeneration"`
+	OverwroteGeneration     int       `json:"overwroteGeneration"`
 }
 
 // ReadPubSubBody is PubSubからPushされたリクエストのBodyを読み込む
@@ -182,12 +188,14 @@ func ReadPubSubBody(body []byte) (*PubSubBody, error) {
 	psmd.Metageneration = mg
 
 	a := PubSubAttributes{
-		BucketID:           b.Message.Attributes.BucketID,
-		ObjectID:           b.Message.Attributes.ObjectID,
-		ObjectGeneration:   b.Message.Attributes.ObjectGeneration,
-		EventTime:          b.Message.Attributes.EventTime,
-		PayloadFormat:      b.Message.Attributes.PayloadFormat,
-		NotificationConfig: b.Message.Attributes.NotificationConfig,
+		BucketID:                b.Message.Attributes.BucketID,
+		ObjectID:                b.Message.Attributes.ObjectID,
+		ObjectGeneration:        b.Message.Attributes.ObjectGeneration,
+		EventTime:               b.Message.Attributes.EventTime,
+		PayloadFormat:           b.Message.Attributes.PayloadFormat,
+		NotificationConfig:      b.Message.Attributes.NotificationConfig,
+		OverwrittenByGeneration: b.Message.Attributes.OverwrittenByGeneration,
+		OverwroteGeneration:     b.Message.Attributes.OverwroteGeneration,
 	}
 	et, err := ParsePubSubStorageNotifyEventType(b.Message.Attributes.EventType)
 	if err != nil {

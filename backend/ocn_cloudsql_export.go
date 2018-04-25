@@ -2,10 +2,10 @@ package backend
 
 import (
 	"context"
-	"net/http"
-
 	"encoding/json"
 	"fmt"
+	"net/http"
+
 	"github.com/favclip/ds2bq"
 	"go.mercari.io/datastore"
 	"google.golang.org/appengine/log"

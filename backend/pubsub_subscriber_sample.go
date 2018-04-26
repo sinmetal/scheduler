@@ -2,7 +2,6 @@ package backend
 
 import (
 	"context"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/sinmetal/pubsub"
@@ -14,16 +13,9 @@ func ReceivePubSubSampleHandler(ctx context.Context, w http.ResponseWriter, r *h
 	for k, v := range r.Header {
 		log.Infof(ctx, "%s:%s", k, v)
 	}
-	body, err := ioutil.ReadAll(r.Body)
-	defer r.Body.Close()
-	if err != nil {
-		log.Errorf(ctx, "%+v", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	log.Infof(ctx, "%s", string(body))
 
-	msg, err := pubsub.ReadBody(body)
+	msg, err := pubsub.ReadBody(r.Body)
+	defer r.Body.Close()
 	if err != nil {
 		log.Errorf(ctx, "%+v", err)
 		w.WriteHeader(http.StatusInternalServerError)

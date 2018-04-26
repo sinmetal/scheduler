@@ -85,6 +85,12 @@
   version = "v0.8.0"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/sinmetal/pubsub"
+  packages = ["."]
+  revision = "923e4c18206991d948729d330179bc7335becdbb"
+
+[[projects]]
   name = "go.mercari.io/datastore"
   packages = [
     ".",
@@ -234,6 +240,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "8f023241ca0ed49387e252d3d3cc2a6bad946dceeb242e91ed56dd129993cb36"
+  inputs-digest = "97742203a7add5d2ca9da433147781022bd0c42cf4c0525fad9b173ba8c53208"
   solver-name = "gps-cdcl"
   solver-version = 1

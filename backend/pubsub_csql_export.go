@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/sinmetal/pubsub"
 	"go.mercari.io/datastore"
 	"google.golang.org/appengine/log"
 )
@@ -24,7 +25,7 @@ func ReceiveCloudSQLExportPubSubHandler(ctx context.Context, w http.ResponseWrit
 	}
 	log.Infof(ctx, "%s", string(body))
 
-	msg, err := ReadPubSubBody(body)
+	msg, err := pubsub.ReadBody(body)
 	if err != nil {
 		log.Errorf(ctx, "%+v", err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -32,7 +33,7 @@ func ReceiveCloudSQLExportPubSubHandler(ctx context.Context, w http.ResponseWrit
 	}
 	log.Infof(ctx, "%+v", msg)
 
-	if ObjectFinalize != msg.Message.Attributes.EventType {
+	if pubsub.ObjectFinalize != msg.Message.Attributes.EventType {
 		log.Infof(ctx, "gs://%s/%s is not exists", msg.Message.Attributes.BucketID, msg.Message.Attributes.ObjectID)
 		w.WriteHeader(http.StatusOK)
 		return

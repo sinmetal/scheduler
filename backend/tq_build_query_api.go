@@ -16,7 +16,7 @@ import (
 // TQBuildQueryAPI is Build Query API
 type TQBuildQueryAPI struct{}
 
-func setUpTQBuildeQueryAPI(swPlugin *swagger.Plugin) {
+func SetupTQBuildQueryAPI(swPlugin *swagger.Plugin) {
 	api := TQBuildQueryAPI{}
 
 	tag := swPlugin.AddTag(&swagger.Tag{Name: "TQ Build Query", Description: "TQ Build Query list"})

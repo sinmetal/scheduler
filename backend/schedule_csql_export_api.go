@@ -11,7 +11,7 @@ import (
 // ScheduleCloudSQLExportAPI is CloudSQLのExport ConfigのScheduleのためのAPI
 type ScheduleCloudSQLExportAPI struct{}
 
-func setupScheduleCloudSQLExportAPI(swPlugin *swagger.Plugin) {
+func SetupScheduleCloudSQLExportAPI(swPlugin *swagger.Plugin) {
 	api := &ScheduleCloudSQLExportAPI{}
 
 	tag := swPlugin.AddTag(&swagger.Tag{Name: "Cloud SQL Export Config", Description: "Cloud SQL Export Config API list"})

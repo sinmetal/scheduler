@@ -19,7 +19,7 @@ const TQCloudSQLExportAfterAPIPath = "/tq/cloudsql/export/after"
 // TQCloudSQLExportAfterAPI is Cloud SQL Export後にOPがどうなったかを確認するTask Queue API
 type TQCloudSQLExportAfterAPI struct{}
 
-func setupTQCloudSQLExportAfterAPI(swPlugin *swagger.Plugin) {
+func SetupTQCloudSQLExportAfterAPI(swPlugin *swagger.Plugin) {
 	api := TQCloudSQLExportAfterAPI{}
 
 	tag := swPlugin.AddTag(&swagger.Tag{Name: "TQ Cloud SQL Export After", Description: "TQ Cloud SQL Export After API list"})

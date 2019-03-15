@@ -15,7 +15,7 @@ import (
 // CronQueryAPI is Cron run to Query API
 type CronQueryAPI struct{}
 
-func setupCronQueryAPI(swPlugin *swagger.Plugin) {
+func SetupCronQueryAPI(swPlugin *swagger.Plugin) {
 	api := &CronQueryAPI{}
 
 	tag := swPlugin.AddTag(&swagger.Tag{Name: "Cron", Description: "Cron list"})

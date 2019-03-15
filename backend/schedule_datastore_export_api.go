@@ -11,7 +11,7 @@ import (
 // ScheduleDatastoreExportAPI is Datastore ExportのScheduleのためのAPI
 type ScheduleDatastoreExportAPI struct{}
 
-func setupScheduleDatastoreExportAPI(swPlugin *swagger.Plugin) {
+func SetupScheduleDatastoreExportAPI(swPlugin *swagger.Plugin) {
 	api := &ScheduleDatastoreExportAPI{}
 
 	tag := swPlugin.AddTag(&swagger.Tag{Name: "ScheduleDatastoreExport", Description: "ScheduleDatastoreExport list"})

@@ -20,7 +20,7 @@ const TQCloudSQLExportAPIPath = "/tq/cloudsql/export"
 // TQCloudSQLExportAPI is Cloud SQL ExportのAPIを呼び出すTask Queue API
 type TQCloudSQLExportAPI struct{}
 
-func setupTQCloudSQLExportAPI(swPlugin *swagger.Plugin) {
+func SetupTQCloudSQLExportAPI(swPlugin *swagger.Plugin) {
 	api := TQCloudSQLExportAPI{}
 
 	tag := swPlugin.AddTag(&swagger.Tag{Name: "TQ Cloud SQL Export", Description: "TQ Cloud SQL Export API list"})

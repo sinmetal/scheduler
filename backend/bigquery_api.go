@@ -17,7 +17,7 @@ import (
 // BigQueryAPI is BigQuery API
 type BigQueryAPI struct{}
 
-func setupBigQuery(swPlugin *swagger.Plugin) {
+func SetupBigQuery(swPlugin *swagger.Plugin) {
 	api := &BigQueryAPI{}
 
 	tag := swPlugin.AddTag(&swagger.Tag{Name: "BigQuery", Description: "BigQuery list"})

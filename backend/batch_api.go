@@ -16,7 +16,7 @@ import (
 // BatchAPI is Batch API
 type BatchAPI struct{}
 
-func setUpBatch(swPlugin *swagger.Plugin) {
+func SetupBatch(swPlugin *swagger.Plugin) {
 	api := &BatchAPI{}
 
 	tag := swPlugin.AddTag(&swagger.Tag{Name: "Batch", Description: "Batch list"})

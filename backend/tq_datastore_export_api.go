@@ -19,7 +19,7 @@ const TQDatastoreExportAPIPath = "/tq/datastore/export"
 type TQDatastoreExportAPI struct {
 }
 
-func setupTQDatastoreExportAPI(swPlugin *swagger.Plugin) {
+func SetupTQDatastoreExportAPI(swPlugin *swagger.Plugin) {
 	api := TQDatastoreExportAPI{}
 
 	tag := swPlugin.AddTag(&swagger.Tag{Name: "TQ Datastore Export", Description: "TQ Datastore Export API list"})

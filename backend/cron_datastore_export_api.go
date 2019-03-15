@@ -12,7 +12,7 @@ import (
 // CronDatastoreExportAPI is Cron Datastore Export API
 type CronDatastoreExportAPI struct{}
 
-func setupCronDatastoreExportAPI(swPlugin *swagger.Plugin) {
+func SetupCronDatastoreExportAPI(swPlugin *swagger.Plugin) {
 	api := &CronDatastoreExportAPI{}
 
 	tag := swPlugin.AddTag(&swagger.Tag{Name: "Cron Datastore Export", Description: "Cron Datastore Export API list"})

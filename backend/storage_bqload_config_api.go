@@ -11,7 +11,7 @@ import (
 // StorageBQLoadConfigAPI is Cloud StorageにUploadされたファイルをBigQueryにLoadするConfigに関するAPI
 type StorageBQLoadConfigAPI struct{}
 
-func setupStorageBQLoadConfigAPI(swPlugin *swagger.Plugin) {
+func SetupStorageBQLoadConfigAPI(swPlugin *swagger.Plugin) {
 	api := &StorageBQLoadConfigAPI{}
 
 	tag := swPlugin.AddTag(&swagger.Tag{Name: "StorageBQLoadConfig", Description: "StorageBQLoadConfig list"})

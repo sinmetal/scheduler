@@ -11,7 +11,7 @@ import (
 // ScheduleAPI is Schedule API
 type ScheduleAPI struct{}
 
-func setupScheduleAPI(swPlugin *swagger.Plugin) {
+func SetupScheduleAPI(swPlugin *swagger.Plugin) {
 	api := &ScheduleAPI{}
 
 	tag := swPlugin.AddTag(&swagger.Tag{Name: "Schedule", Description: "Schedule list"})

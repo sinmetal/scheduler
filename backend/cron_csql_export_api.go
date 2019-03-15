@@ -12,7 +12,7 @@ import (
 // CronCloudSQLExportAPI is Cron Cloud SQL Export API
 type CronCloudSQLExportAPI struct{}
 
-func setupCronCloudSQLExportAPI(swPlugin *swagger.Plugin) {
+func SetupCronCloudSQLExportAPI(swPlugin *swagger.Plugin) {
 	api := &CronCloudSQLExportAPI{}
 
 	tag := swPlugin.AddTag(&swagger.Tag{Name: "Cron Cloud SQL Export", Description: "Cron Cloud SQL Export API list"})

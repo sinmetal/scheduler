@@ -75,3 +75,27 @@ func TestCronDatastoreExportAPI_Get(t *testing.T) {
 		t.Fatalf("unexpected Tasks.Bucket expected %s; got %s", e, g)
 	}
 }
+
+func TestBuildBlocks(t *testing.T) {
+	cases := []struct {
+		name       string
+		array      []string
+		blocSize   int
+		wantLength int
+	}{
+		{"empty", []string{}, 1, 0},
+		{"1", []string{"Hoge"}, 1, 1},
+		{"2", []string{"Hoge", "Fuga"}, 1, 2},
+		{"many", []string{"Hoge", "Fuga", "Moge", "Popo", "Poge"}, 2, 3},
+	}
+
+	for _, tt := range cases {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			got := buildBlocks(tt.array, tt.blocSize)
+			if len(got) != tt.wantLength {
+				t.Errorf("want %v but got %v, %v", tt.wantLength, len(got), got)
+			}
+		})
+	}
+}

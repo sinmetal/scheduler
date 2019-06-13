@@ -8,12 +8,10 @@ import (
 	"net/http"
 	"time"
 
-	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/bigquery/v2"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/log"
-	"google.golang.org/appengine/urlfetch"
 )
 
 // ImportBigQueryHandleFunc returns a http.HandlerFunc that imports GCSObject to BigQuery.
@@ -70,19 +68,17 @@ type GCSObjectToBQJobReq struct {
 	TimeCreated time.Time `json:"TimeCreated"`
 }
 
-func insertImportJob(c context.Context, req *GCSObjectToBQJobReq, projectID, datasetID string) error {
-	log.Infof(c, "ds2bq: bucket: %s, filePath: %s, timeCreated: %s", req.Bucket, req.FilePath, req.TimeCreated)
+func insertImportJob(ctx context.Context, req *GCSObjectToBQJobReq, projectID, datasetID string) error {
+	log.Infof(ctx, "ds2bq: bucket: %s, filePath: %s, timeCreated: %s", req.Bucket, req.FilePath, req.TimeCreated)
 
 	if req.Bucket == "" || req.FilePath == "" || req.KindName == "" {
-		log.Warningf(c, "ds2bq: unexpected parameters %#v", req)
+		log.Warningf(ctx, "ds2bq: unexpected parameters %#v", req)
 		return nil
 	}
 
-	client := &http.Client{
-		Transport: &oauth2.Transport{
-			Source: google.AppEngineTokenSource(c, bigquery.BigqueryScope),
-			Base:   &urlfetch.Transport{Context: c},
-		},
+	client, err := google.DefaultClient(ctx, bigquery.BigqueryScope)
+	if err != nil {
+		return err
 	}
 
 	bqs, err := bigquery.New(client)
@@ -107,12 +103,12 @@ func insertImportJob(c context.Context, req *GCSObjectToBQJobReq, projectID, dat
 		},
 	}
 
-	rj, err := bqs.Jobs.Insert(appengine.AppID(c), job).Do()
+	rj, err := bqs.Jobs.Insert(appengine.AppID(ctx), job).Do()
 	if err != nil {
-		log.Warningf(c, "ds2bq: unexpected error in HandleBackupToBQJob: %s", err)
+		log.Warningf(ctx, "ds2bq: unexpected error in HandleBackupToBQJob: %s", err)
 		return nil
 	}
-	log.Infof(c, "JobID=%s, Status=%s", rj.Id, rj.Status.State)
+	log.Infof(ctx, "JobID=%s, Status=%s", rj.Id, rj.Status.State)
 
 	return nil
 }

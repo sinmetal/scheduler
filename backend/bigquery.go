@@ -3,16 +3,13 @@ package backend
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"strings"
 
 	"github.com/pkg/errors"
-	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/bigquery/v2"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/log"
-	"google.golang.org/appengine/urlfetch"
 )
 
 // BigQueryService is BigQuery APIのためのService
@@ -121,11 +118,9 @@ func (service *BigQueryService) LoadWithAutodetect(ctx context.Context, param *B
 }
 
 func (service *BigQueryService) insertLoadJob(ctx context.Context, j *bigquery.Job) (*bigquery.Job, error) {
-	client := &http.Client{
-		Transport: &oauth2.Transport{
-			Source: google.AppEngineTokenSource(ctx, bigquery.BigqueryScope),
-			Base:   &urlfetch.Transport{Context: ctx},
-		},
+	client, err := google.DefaultClient(ctx, bigquery.BigqueryScope)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed google.DefaultClient")
 	}
 
 	bqs, err := bigquery.New(client)
